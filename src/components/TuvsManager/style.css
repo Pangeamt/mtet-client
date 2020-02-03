@@ -1,0 +1,6 @@
+.nested-table {
+  margin: -8px -20px -9px !important;
+}
+.nested-table .ant-table-small {
+  border: none;
+}
