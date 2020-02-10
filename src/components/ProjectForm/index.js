@@ -1,9 +1,16 @@
 import React, { useState } from "react";
-import { Form, Input, Upload, Icon, Button, Select, message } from "antd";
-
-import { data } from "./../../data";
-
-const { languages } = data;
+import {
+  Form,
+  Input,
+  Upload,
+  Icon,
+  Button,
+  Select,
+  message,
+  Switch,
+  Checkbox,
+  InputNumber
+} from "antd";
 
 const checkFile = (file, allowedFiles) => {
   var extension = file.name.substr(file.name.lastIndexOf(".") + 1);
@@ -19,15 +26,18 @@ const ProjectFormCmp = ({ form, loading, add, save, project }) => {
 
   const handleSubmit = e => {
     e.preventDefault();
+    if (!project && !fileList.length) {
+      message.error("You need to upload a tmx file");
+      return;
+    }
     form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         values["files"] = fileList;
         if (!project) {
-          add(values);
+          add(values, form);
         } else {
-          save(values);
+          save(values, form);
         }
-        form.resetFields();
       }
     });
   };
@@ -42,6 +52,16 @@ const ProjectFormCmp = ({ form, loading, add, save, project }) => {
     wrapperCol: {
       xs: { span: 24 },
       sm: { span: 16 }
+    }
+  };
+  const _formItemLayout = {
+    labelCol: {
+      xs: { span: 24 },
+      sm: { span: 20 }
+    },
+    wrapperCol: {
+      xs: { span: 24 },
+      sm: { span: 4 }
     }
   };
   const tailFormItemLayout = {
@@ -103,52 +123,7 @@ const ProjectFormCmp = ({ form, loading, add, save, project }) => {
           ]
         })(<Input />)}
       </Form.Item>
-      <Form.Item label="Source" hasFeedback>
-        {getFieldDecorator("source", {
-          initialValue: project ? project.source : "",
-          rules: [
-            {
-              required: true,
-              message: "Please select the source!"
-            }
-          ]
-        })(
-          <Select>
-            {languages &&
-              Object.keys(languages).length &&
-              Object.keys(languages).map(item => {
-                const key = Object.keys(item);
-                console.log(key);
-                return (
-                  <Select.Option value={item}>{languages[item]}</Select.Option>
-                );
-              })}
-          </Select>
-        )}
-      </Form.Item>
-      <Form.Item label="Target" hasFeedback>
-        {getFieldDecorator("target", {
-          initialValue: project ? project.target : "",
-          rules: [
-            {
-              required: true,
-              message: "Please select the target!"
-            }
-          ]
-        })(
-          <Select>
-            {languages &&
-              Object.keys(languages).length &&
-              Object.keys(languages).map(item => {
-                const key = Object.keys(item);
-                console.log(key);
-                return (
-                  <Select.Option value={item}>{languages[item]}</Select.Option>
-                );
-              })}
-          </Select>
-        )}
-      </Form.Item>
+
       <Form.Item label="Type of evaluation" hasFeedback>
         {getFieldDecorator("type", {
           initialValue: project ? project.type : "",
@@ -168,12 +143,46 @@ const ProjectFormCmp = ({ form, loading, add, save, project }) => {
       </Form.Item>
 
       <Form.Item {...tailFormItemLayout}>
-        <Upload {...props}>
-          <Button disabled={fileList.length}>
-            <Icon type="upload" /> Select Tmx File
-          </Button>
-        </Upload>
+        {getFieldDecorator("showSourceText", {
+          valuePropName: "checked",
+          initialValue: project ? project.showSourceText : false
+        })(<Checkbox>Source text is displayed</Checkbox>)}
       </Form.Item>
+
+      <Form.Item {...tailFormItemLayout}>
+        {getFieldDecorator("showReferenceText", {
+          initialValue: project ? project.showReferenceText : "",
+          valuePropName: "checked"
+        })(<Checkbox>Reference text is displayed</Checkbox>)}
+      </Form.Item>
+      <Form.Item {...tailFormItemLayout}>
+        {getFieldDecorator("evaluationsOverlap", {
+          initialValue: project ? project.evaluationsOverlap : "",
+          valuePropName: "checked"
+        })(
+          <Checkbox>Evaluations overlap between different evaluators</Checkbox>
+        )}
+      </Form.Item>
+      <Form.Item
+        {..._formItemLayout}
+        label="Are a percentage of the evaluations randomly repeated?"
+      >
+        {getFieldDecorator("percentageEvaluationsRandomlyRepeated", {
+          initialValue: project
+            ? project.percentageEvaluationsRandomlyRepeated
+            : ""
+        })(<InputNumber min={0} max={100} defaultValue={3} />)}
+      </Form.Item>
+
+      {!project && (
+        <Form.Item {...tailFormItemLayout}>
+          <Upload {...props}>
+            <Button disabled={fileList.length}>
+              <Icon type="upload" /> Select Tmx File
+            </Button>
+          </Upload>
+        </Form.Item>
+      )}
 
       <Form.Item {...tailFormItemLayout}>
         <Button loading={loading} type="primary" htmlType="submit">

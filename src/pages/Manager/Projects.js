@@ -42,7 +42,7 @@ const Projects = () => {
     }
   };
 
-  const add = async values => {
+  const add = async (values, form) => {
     try {
       setLoading(true);
 
@@ -60,17 +60,22 @@ const Projects = () => {
           "content-type": "multipart/form-data"
         }
       });
-
-      setVisible(false);
       fetch(true);
+      setVisible(false);
+      form.resetFields();
+
       message.success("Successful Action!");
     } catch (error) {
-      message.error(error.message);
+      if (error.response.data.message) {
+        message.error(error.response.data.message);
+      } else {
+        message.error(error.message);
+      }
       setLoading(false);
     }
   };
 
-  const save = async values => {
+  const save = async (values, form) => {
     try {
       setLoading(true);
       await axios({
@@ -78,8 +83,9 @@ const Projects = () => {
         url: `${HOST_API}/v1/projects/${project.id}`,
         data: values
       });
-      setVisible(false);
       fetch(true);
+      setVisible(false);
+      form.resetFields();
       message.success("Successful Action!");
     } catch (error) {
       message.error(error.message);
@@ -114,6 +120,12 @@ const Projects = () => {
   const showsTuvs = value => {
     setMode("tuvs");
     setTab("tuvs");
+    setProject(value);
+  };
+
+  const showsTasks = value => {
+    setMode("tasks");
+    setTab("tasks");
     setProject(value);
   };
 
@@ -167,6 +179,7 @@ const Projects = () => {
               select={selectProject}
               remove={remove}
               showsTuvs={showsTuvs}
+              showsTasks={showsTasks}
             />
           </TabPane>
           {mode === "tuvs" && project && project.Tuvs.length && (
@@ -174,10 +187,16 @@ const Projects = () => {
               <TuvsManager tuvs={project.Tuvs} />
             </TabPane>
           )}
+          {mode === "tasks" && project && (
+            <TabPane tab={`Tasks (${project.name})`} key="tasks">
+              tasks
+            </TabPane>
+          )}
         </Tabs>
       </Card>
 
       <Modal
+        width={800}
         title={getTitle()}
         visible={visible}
         onCancel={handleCancel}
