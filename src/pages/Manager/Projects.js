@@ -7,6 +7,7 @@ import { HOST_API } from "./../../config";
 import ProjectsList from "./../../components/ProjectsList";
 import ProjectForm from "./../../components/ProjectForm";
 import TuvsManager from "./../../components/TuvsManager";
+import Tasks from "./../../components/Tasks";
 
 const { TabPane } = Tabs;
 
@@ -189,7 +190,7 @@ const Projects = () => {
           )}
           {mode === "tasks" && project && (
             <TabPane tab={`Tasks (${project.name})`} key="tasks">
-              tasks
+              <Tasks project={project} />
             </TabPane>
           )}
         </Tabs>
