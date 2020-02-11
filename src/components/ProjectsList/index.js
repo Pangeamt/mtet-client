@@ -38,60 +38,7 @@ const ProjectsList = ({
       dataIndex: "type",
       key: "type"
     },
-    {
-      title: "Data",
-      dataIndex: "type",
-      key: "data",
-      render: (text, record) => {
-        if (record.type === "zero-to-one-hundred") {
-          return (
-            <Row>
-              <Col>
-                {record.showSourceText && (
-                  <Row>
-                    <Col>
-                      <Text code>- Source text is displayed</Text>
-                    </Col>
-                  </Row>
-                )}
-                {record.showReferenceText && (
-                  <Row>
-                    <Col>
-                      <Text code>- Reference text is displayed</Text>
-                    </Col>
-                  </Row>
-                )}{" "}
-                {record.evaluationsOverlap && (
-                  <Row>
-                    <Col>
-                      <Text code>
-                        - Evaluations overlap between different evaluators
-                      </Text>
-                    </Col>
-                  </Row>
-                )}
-                {record.percentageEvaluationsRandomlyRepeated && (
-                  <Row>
-                    <Col>
-                      <Text code>
-                        - Percentage of the evaluations randomly repeated{" "}
-                        <strong>
-                          {record.percentageEvaluationsRandomlyRepeated}%
-                        </strong>
-                      </Text>
-                    </Col>
-                  </Row>
-                )}
-              </Col>
-            </Row>
-          );
-        }
-        // showSourceText: DataTypes.BOOLEAN,
-        // showReferenceText: DataTypes.BOOLEAN,
-        // evaluationsOverlap: DataTypes.BOOLEAN,
-        // percentageEvaluationsRandomlyRepeated: DataTypes.INTEGER,
-      }
-    },
+
     {
       title: "Task",
       key: "task",

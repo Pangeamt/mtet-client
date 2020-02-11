@@ -1,16 +1,5 @@
 import React, { useState } from "react";
-import {
-  Form,
-  Input,
-  Upload,
-  Icon,
-  Button,
-  Select,
-  message,
-  Switch,
-  Checkbox,
-  InputNumber
-} from "antd";
+import { Form, Input, Upload, Icon, Button, Select, message } from "antd";
 
 const checkFile = (file, allowedFiles) => {
   var extension = file.name.substr(file.name.lastIndexOf(".") + 1);
@@ -54,16 +43,7 @@ const ProjectFormCmp = ({ form, loading, add, save, project }) => {
       sm: { span: 16 }
     }
   };
-  const _formItemLayout = {
-    labelCol: {
-      xs: { span: 24 },
-      sm: { span: 20 }
-    },
-    wrapperCol: {
-      xs: { span: 24 },
-      sm: { span: 4 }
-    }
-  };
+
   const tailFormItemLayout = {
     wrapperCol: {
       xs: {
@@ -140,38 +120,6 @@ const ProjectFormCmp = ({ form, loading, add, save, project }) => {
             </Select.Option>
           </Select>
         )}
-      </Form.Item>
-
-      <Form.Item {...tailFormItemLayout}>
-        {getFieldDecorator("showSourceText", {
-          valuePropName: "checked",
-          initialValue: project ? project.showSourceText : false
-        })(<Checkbox>Source text is displayed</Checkbox>)}
-      </Form.Item>
-
-      <Form.Item {...tailFormItemLayout}>
-        {getFieldDecorator("showReferenceText", {
-          initialValue: project ? project.showReferenceText : "",
-          valuePropName: "checked"
-        })(<Checkbox>Reference text is displayed</Checkbox>)}
-      </Form.Item>
-      <Form.Item {...tailFormItemLayout}>
-        {getFieldDecorator("evaluationsOverlap", {
-          initialValue: project ? project.evaluationsOverlap : "",
-          valuePropName: "checked"
-        })(
-          <Checkbox>Evaluations overlap between different evaluators</Checkbox>
-        )}
-      </Form.Item>
-      <Form.Item
-        {..._formItemLayout}
-        label="Are a percentage of the evaluations randomly repeated?"
-      >
-        {getFieldDecorator("percentageEvaluationsRandomlyRepeated", {
-          initialValue: project
-            ? project.percentageEvaluationsRandomlyRepeated
-            : ""
-        })(<InputNumber min={0} max={100} defaultValue={3} />)}
       </Form.Item>
 
       {!project && (

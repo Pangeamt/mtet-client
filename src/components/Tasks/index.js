@@ -1,32 +1,37 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   Row,
   Col,
   Table,
   message,
-  Alert,
+  Modal,
   Button,
+  List,
   Typography,
   Progress,
   Icon
 } from "antd";
 import axios from "axios";
 import { HOST_API } from "./../../config";
+import { AppContext } from "./../../AppContext";
+import TaskForm from "./../TaskForm";
 
 import "./style.css";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const Tasks = ({ project }) => {
+  const { token } = useContext(AppContext);
   const tuvs = project.Tuvs || [];
 
+  const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingActive, setLoadingActive] = useState(false);
   const [evaluators, setEvaluators] = useState([]);
   const [collectionsTasks, setCollectionsTasks] = useState([]);
-  const [selected, setSelected] = useState([]);
   const [tus, setTus] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const [selectedTask, setSelectedTask] = useState([]);
 
   useEffect(() => {
     fetchEvaluators();
@@ -54,6 +59,7 @@ const Tasks = ({ project }) => {
 
   const fetch = async () => {
     try {
+      axios.defaults.headers.common["x-access-token"] = token;
       const { data } = await axios.get(`${HOST_API}/v1/tasks`, {
         params: {
           project: project.id
@@ -68,6 +74,7 @@ const Tasks = ({ project }) => {
   const active = async (record, value) => {
     try {
       setLoadingActive(`load-${record.id}`);
+      axios.defaults.headers.common["x-access-token"] = token;
       const {
         data: { doc }
       } = await axios({
@@ -91,34 +98,148 @@ const Tasks = ({ project }) => {
     }
   };
 
-  const e_columns = [
-    {
-      title: "Nickname",
-      dataIndex: "nickname",
-      key: "nickname"
-    },
-    {
-      title: "Email",
-      dataIndex: "email",
-      key: "email"
-    }
-  ];
-  const c_columns = [
-    {
-      title: "Evaluators",
-      key: "evaluators",
-      render: (text, record) => {
-        return <span>{record.evaluator.nickname}</span>;
+  const handleCancel = e => {
+    setVisible(false);
+  };
+
+  const createTasks = (values, form) => {
+    const {
+      numberTasks,
+      overlappingTuvs,
+      percentageEvaluationsRandomlyRepeated,
+      showSourceText,
+      showReferenceText
+    } = values;
+
+    const nTus = Object.keys(tus).length;
+    const txe = parseInt(nTus / numberTasks) + 1;
+    const copyTus = [];
+    Object.keys(tus).map(item => {
+      copyTus.push(tus[item]);
+    });
+
+    const newTasks = [];
+    for (let i = 0; i < numberTasks; i++) {
+      let aux = {
+        tus: [],
+        tuvs: 0,
+        showSourceText,
+        showReferenceText
+      };
+
+      for (let j = 0; j < txe; j++) {
+        const pop = copyTus.pop();
+        if (pop) {
+          aux.tus.push(pop);
+          aux.tuvs += pop.length;
+        }
       }
-    },
-    {
-      title: "Tus",
-      key: "tus",
-      render: (text, record) => {
-        return <span>{record.tus.length}</span>;
+      newTasks.push(aux);
+    }
+
+    if (overlappingTuvs > 0) {
+      const nt = parseInt((txe * overlappingTuvs) / 100); //5% Overlapping
+
+      for (let i = 0; i < newTasks.length; i++) {
+        let aux = [];
+        for (let j = 0; j < newTasks.length; j++) {
+          if (i !== j) {
+            newTasks[j].tus.forEach((element, index) => {
+              if (index < nt) {
+                aux.push(element);
+              }
+            });
+          }
+        }
+        aux.map(item => {
+          newTasks[i].tus.push(item);
+          newTasks[i].tuvs += item.length;
+        });
       }
     }
-  ];
+    if (percentageEvaluationsRandomlyRepeated) {
+      newTasks.forEach(element => {
+        let aux = element.tus;
+        const ntr = parseInt(
+          (element.tus.length * percentageEvaluationsRandomlyRepeated) / 100
+        );
+
+        for (let i = 0; i < ntr; i++) {
+          const pos = Math.floor(Math.random() * ntr + 1);
+          element.tus.push(aux[pos]);
+          element.tuvs += aux[pos].length;
+        }
+      });
+    }
+
+    setCollectionsTasks(newTasks);
+  };
+
+  const create = async () => {
+    try {
+      setLoading(true);
+      axios.defaults.headers.common["x-access-token"] = token;
+      await axios({
+        method: "post",
+        url: `${HOST_API}/v1/tasks`,
+        data: { tasks: collectionsTasks, project: project.id }
+      });
+
+      setCollectionsTasks([]);
+      fetch();
+      setLoading(false);
+
+      message.success("Successful Action!");
+    } catch (error) {
+      message.error(error.message);
+      setLoading(false);
+    }
+  };
+
+  const assign = async evaluator => {
+    try {
+      setLoadingActive(`assign-${evaluator}`);
+      axios.defaults.headers.common["x-access-token"] = token;
+      await axios({
+        method: "post",
+        url: `${HOST_API}/v1/tasks/${selectedTask.id}`,
+        data: { evaluator }
+      });
+
+      fetch();
+      setLoadingActive(false);
+      handleCancel();
+      message.success("Successful Action!");
+    } catch (error) {
+      message.error(error.message);
+      setLoadingActive(false);
+    }
+  };
+
+  const restart = async task => {
+    try {
+      setLoadingActive(`assign-${task}`);
+      axios.defaults.headers.common["x-access-token"] = token;
+      await axios({
+        method: "put",
+        url: `${HOST_API}/v1/tasks/${task}`
+      });
+
+      fetch();
+      setLoadingActive(false);
+      handleCancel();
+      message.success("Successful Action!");
+    } catch (error) {
+      message.error(error.message);
+      setLoadingActive(false);
+    }
+  };
+
+  const showModal = selected => {
+    setSelectedTask(selected);
+    setVisible(true);
+  };
+
   const t_columns = [
     {
       title: "Id",
@@ -129,13 +250,27 @@ const Tasks = ({ project }) => {
       title: "Evaluator",
       key: "evaluator",
       render: (text, record) => {
-        return (
-          <span>
-            {`${record.user.nickname.toUpperCase()}`}
-            <br />
-            <Icon type="mail" /> {record.user.email}
-          </span>
-        );
+        if (record.user) {
+          return (
+            <span>
+              {`${record.user.nickname.toUpperCase()}`}
+              <br />
+              <Icon type="mail" /> {record.user.email}
+            </span>
+          );
+        } else {
+          return (
+            <Button
+              onClick={() => {
+                showModal(record);
+              }}
+              type="primary"
+              size="small"
+            >
+              Assign evaluator
+            </Button>
+          );
+        }
       }
     },
     {
@@ -145,6 +280,7 @@ const Tasks = ({ project }) => {
         if (record.active) {
           return (
             <Button
+              disabled={!record.user}
               onClick={() => {
                 active(record, false);
               }}
@@ -158,6 +294,7 @@ const Tasks = ({ project }) => {
         } else {
           return (
             <Button
+              disabled={!record.user}
               onClick={() => {
                 active(record, true);
               }}
@@ -185,99 +322,60 @@ const Tasks = ({ project }) => {
           </span>
         );
       }
+    },
+    {
+      title: "",
+      key: "restart",
+      render: (text, record) => {
+        if (record.active || record.user) {
+          return (
+            <Button
+              loading={loadingActive === `restart-${record.id}`}
+              onClick={() => {
+                restart(record.id);
+              }}
+              type="danger"
+              size="small"
+              icon="reload"
+            >
+              Restart
+            </Button>
+          );
+        }
+      }
     }
   ];
 
-  const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
-      );
-      setSelected(selectedRows);
+  const e_columns = [
+    {
+      title: "Nickname",
+      dataIndex: "nickname",
+      key: "nickname"
     },
-    getCheckboxProps: record => ({
-      disabled: record.name === "Disabled User", // Column configuration not to be checked
-      name: record.name
-    })
-  };
-
-  const createTasks = () => {
-    const ntus = Object.keys(tus).length;
-    const txe = ntus / selected.length;
-    const copyTus = [];
-    Object.keys(tus).map(item => {
-      copyTus.push(tus[item]);
-    });
-
-    const newTasks = [];
-    selected.map(item => {
-      let aux = {
-        evaluator: item,
-        tus: []
-      };
-      for (let i = 0; i < txe; i++) {
-        const pop = copyTus.pop();
-        if (pop) aux.tus.push(pop);
-      }
-      newTasks.push(aux);
-    });
-
-    if (project.evaluationsOverlap) {
-      const nt = parseInt((txe * 5) / 100); //5% Overlapping
-
-      for (let i = 0; i < newTasks.length; i++) {
-        let aux = [];
-        for (let j = 0; j < newTasks.length; j++) {
-          if (i !== j) {
-            newTasks[j].tus.forEach((element, index) => {
-              if (index < nt) {
-                aux.push(element);
-              }
-            });
-          }
-        }
-        aux.map(item => newTasks[i].tus.push(item));
-      }
-    }
-    if (project.percentageEvaluationsRandomlyRepeated) {
-      newTasks.forEach(element => {
-        let aux = element.tus;
-        const ntr = parseInt(
-          (element.tus.length * project.percentageEvaluationsRandomlyRepeated) /
-            100
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email"
+    },
+    {
+      title: "",
+      key: "select",
+      render: (text, record) => {
+        return (
+          <Button
+            loading={loadingActive === `assign-${record.id}`}
+            onClick={() => {
+              assign(record.id);
+            }}
+            type="primary"
+            size="small"
+          >
+            Select
+          </Button>
         );
-
-        for (let i = 0; i < ntr; i++) {
-          const pos = Math.floor(Math.random() * ntr + 1);
-          element.tus.push(aux[pos]);
-        }
-      });
+      }
     }
-    setCollectionsTasks(newTasks);
-  };
-
-  const create = async (values, form) => {
-    try {
-      setLoading(true);
-
-      const req = await axios({
-        method: "post",
-        url: `${HOST_API}/v1/tasks`,
-        data: { tasks: collectionsTasks, project: project.id }
-      });
-      console.log(req);
-      setCollectionsTasks([]);
-      setLoading(false);
-
-      message.success("Successful Action!");
-    } catch (error) {
-      message.error(error.message);
-      setLoading(false);
-    }
-  };
-
+  ];
   return (
     <Row>
       <Col xs={24} md={12} className="p-2">
@@ -285,69 +383,79 @@ const Tasks = ({ project }) => {
       </Col>
       <Col xs={24} md={12} className="p-2">
         <Row>
-          <Col>
-            <Alert
-              className="mb-2"
-              message="Select the users to whom the tasks will be assigned."
-              type="info"
-              showIcon
+          <Col xs={24} md={16}>
+            <TaskForm
+              create={createTasks}
+              project={project}
+              tasks={collectionsTasks}
             />
           </Col>
-        </Row>
-        <Row>
-          <Col>
-            <Table
-              className="w-100"
-              rowSelection={rowSelection}
-              size="small"
-              columns={e_columns}
-              dataSource={evaluators}
-            />
+          <Col xs={24} md={8}>
+            {collectionsTasks.length > 0 && (
+              <Row>
+                <Col>
+                  <List
+                    size="small"
+                    header={<Title level={4}>New Tasks</Title>}
+                    bordered
+                    dataSource={collectionsTasks}
+                    renderItem={(item, i) => (
+                      <List.Item>
+                        <Row
+                          type="flex"
+                          justify="space-between"
+                          className="w-100"
+                        >
+                          <Col xs={4}>{i + 1}</Col>
+                          <Col xs={10}>
+                            #Tus: <Text underline>{item.tus.length}</Text>
+                          </Col>
+                          <Col xs={10}>
+                            #Tuvs: <Text underline>{item.tuvs}</Text>
+                          </Col>
+                        </Row>
+                      </List.Item>
+                    )}
+                  />
+                </Col>
+                <Col className="my-5">
+                  <Button
+                    className="ml-2"
+                    style={{ float: "right" }}
+                    type="primary"
+                    loading={loading}
+                    onClick={create}
+                  >
+                    Confirm
+                  </Button>
+                  <Button
+                    style={{ float: "right" }}
+                    type="danger"
+                    onClick={() => {
+                      setCollectionsTasks([]);
+                    }}
+                  >
+                    Clean
+                  </Button>
+                </Col>
+              </Row>
+            )}
           </Col>
         </Row>
-        {collectionsTasks.length > 0 && (
-          <Row>
-            <Col>
-              <Title level={4}>New Tasks</Title>
-              <Table
-                className="w-100"
-                size="small"
-                columns={c_columns}
-                dataSource={collectionsTasks}
-              />
-            </Col>
-          </Row>
-        )}
-        {collectionsTasks.length === 0 && (
-          <Row>
-            <Col>
-              <Button
-                disabled={selected.length < 1}
-                style={{ float: "right" }}
-                type="primary"
-                onClick={createTasks}
-              >
-                Create Tasks
-              </Button>
-            </Col>
-          </Row>
-        )}
-        {collectionsTasks.length > 0 && (
-          <Row>
-            <Col>
-              <Button
-                disabled={selected.length < 1}
-                style={{ float: "right" }}
-                type="primary"
-                loading={loading}
-                onClick={create}
-              >
-                Confirm creation of new tasks
-              </Button>
-            </Col>
-          </Row>
-        )}
       </Col>
+      <Modal
+        title="Evaluators"
+        visible={visible}
+        onCancel={handleCancel}
+        footer={false}
+      >
+        <Table
+          className="w-100"
+          size="small"
+          columns={e_columns}
+          dataSource={evaluators}
+        />
+      </Modal>
     </Row>
   );
 };
