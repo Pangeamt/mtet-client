@@ -38,37 +38,43 @@ const AppLayout = props => {
 
   return (
     <LayoutWrapper style={{ minHeight: "100vh" }}>
-      <Sider collapsed={collapsed} onCollapse={onCollapse}>
-        <div className="logo" />
-        {user.role === "admin" && <AdminMenu />}
-        {user.role === "pm" && <ManagerMenu />}
-      </Sider>
+      {user.role !== "evaluator" && (
+        <Sider collapsed={collapsed} onCollapse={onCollapse}>
+          <div className="logo" />
+          {user.role === "admin" && <AdminMenu />}
+          {user.role === "pm" && <ManagerMenu />}
+        </Sider>
+      )}
       <Layout>
         <Header onCollapse={onCollapse} collapsed={collapsed} />
         <Content style={{ margin: "0 16px" }}>
           <Location>
             {({ location }) => {
               let words = location.pathname.split("/");
-              return (
-                <Breadcrumb style={{ margin: "16px 0" }}>
-                  {words.map((item, i) => {
-                    if (item) {
-                      item = item.split("-").join(" ");
-                      return (
-                        <Breadcrumb.Item key={`bri-${i}`}>
-                          {item.charAt(0).toUpperCase() + item.slice(1)}
-                        </Breadcrumb.Item>
-                      );
-                    }
-                    return null;
-                  })}
-                </Breadcrumb>
-              );
+              if (user.role !== "evaluator") {
+                return (
+                  <Breadcrumb style={{ margin: "16px 0" }}>
+                    {words.map((item, i) => {
+                      if (item) {
+                        item = item.split("-").join(" ");
+                        return (
+                          <Breadcrumb.Item key={`bri-${i}`}>
+                            {item.charAt(0).toUpperCase() + item.slice(1)}
+                          </Breadcrumb.Item>
+                        );
+                      }
+                      return null;
+                    })}
+                  </Breadcrumb>
+                );
+              }
             }}
           </Location>
           {props.children}
         </Content>
-        <Footer style={{ textAlign: "center" }}>Reentals ©2020</Footer>
+        <Footer style={{ textAlign: "center" }}>
+          Power by Pangeanic ©2020
+        </Footer>
       </Layout>
     </LayoutWrapper>
   );

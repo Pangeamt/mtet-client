@@ -48,8 +48,8 @@ export const App = () => {
             <Projects path="projects" />
           </Manager>
           <Evaluator path="evaluator">
-            {/* <DashboardEvaluator path="/" />
-            <BankAccounts path="bank-accounts" /> */}
+            <DashboardEvaluator path="/" />
+            {/* <BankAccounts path="bank-accounts" /> */}
           </Evaluator>
         </Router>
       </React.Fragment>

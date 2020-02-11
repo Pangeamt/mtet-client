@@ -1,148 +1,128 @@
-import React from "react";
-import { Row, Col, Card, Icon, Tag, List } from "antd";
-import currencyFormatter from "currency-formatter";
-import styled from "styled-components";
+import React, { useState, useEffect, useContext } from "react";
+import {
+  Row,
+  Col,
+  Button,
+  Progress,
+  message,
+  Table,
+  Typography,
+  Card
+} from "antd";
+import axios from "axios";
 
-const SpanName = styled.span`
-  width: 50%;
-`;
+import { HOST_API } from "./../../config";
+import { AppContext } from "./../../AppContext";
+import IMAGE from "./undraw_body_text_l3ld.png";
 
-const list = {
-  checks: [
-    {
-      name: "Fernan",
-      type: "out",
-      datetime: "27/03/2018"
-    },
-    {
-      name: "JAMES",
-      type: "in",
-      datetime: "01/04/2018"
-    },
-    {
-      name: "Luca Abbruzzese",
-      type: "in",
-      datetime: "01/04/2018"
-    },
-    {
-      name: "Fernan",
-      type: "out",
-      datetime: "30/06/2018"
-    },
-    {
-      name: "Luca Abbruzzese",
-      type: "in",
-      datetime: "01/04/2018"
+const { Title } = Typography;
+
+const columns = [
+  {
+    title: "TaskId",
+    dataIndex: "TaskId",
+    key: "TaskId"
+  },
+  {
+    title: "Tuvs",
+    key: "tuvs",
+    render: (text, record) => {
+      return <span>{record.total}</span>;
     }
-  ]
-};
+  },
+  {
+    title: "Complete",
+    key: "complete",
+    render: (text, record) => {
+      return <span>{record.complete}</span>;
+    }
+  },
+  {
+    title: "Progress",
+    key: "complete",
+    render: (text, record) => {
+      return <Progress percent={(record.complete * 100) / record.total} />;
+    }
+  },
+  {
+    title: "",
+    key: "address",
+    width: 100,
+    render: (text, record) => {
+      return (
+        <Button style={{ width: 80 }} type="primary" size="small">
+          {record.complete > 0 ? "Continue" : "Start"}
+        </Button>
+      );
+    }
+  }
+];
 
 const Dashboard = () => {
+  const { user, token } = useContext(AppContext);
+
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    fetch();
+  }, []);
+
+  const fetch = async () => {
+    try {
+      axios.defaults.headers.common["x-access-token"] = token;
+      const { data } = await axios.get(`${HOST_API}/v1/tasks/evaluator`);
+      setTasks(data);
+    } catch (error) {
+      message.error(error.message);
+    }
+  };
+
   return (
-    <Row>
-      <Col>
+    <div className="container mt-5">
+      <article className="article">
         <Row>
           <Col>
-            <Card></Card>
+            <div class="img-card__body img-card__body--left">
+              <h2 class="img-card__title text-capitalize">
+                Hello {user.nickname}!
+              </h2>
+              <p class="img-card__desc lead">
+                Here you will be shown the tasks assigned to you and the status
+                of each of them.
+              </p>
+            </div>
           </Col>
         </Row>
         <Row>
-          <Col className="p-2" xs={24} md={12} lg={8}>
-            <div className="number-card-v1 mb-4">
-              <div className="card-top">
-                <span>
-                  19<span className="h5">%</span>
-                </span>
-              </div>
-              <div className="card-info">
-                <span>Occupancy rate</span>
-              </div>
-              <div className="card-bottom">
-                <Row className="w-100 mt-3">
-                  <Col xs={8} className="d-flex justify-content-center">
-                    <Icon type="line-chart" className="text-info" />
-                  </Col>
-                  <Col
-                    xs={16}
-                    style={{ fontSize: 15 }}
-                    className="d-flex justify-content-center "
-                  >
-                    <div>
-                      <p className="link-animated-hover link-hover-v4">
-                        <Tag color="#2db7f5">16</Tag> Available properties
-                      </p>
-                      <p className="link-animated-hover link-hover-v4">
-                        <Tag color="#2db7f5">3</Tag> Tenants
-                      </p>
-                    </div>
-                  </Col>
-                </Row>
-              </div>
-            </div>
-          </Col>{" "}
-          <Col className="p-2" xs={24} md={12} lg={8}>
-            <div className="number-card-v1 mb-4">
-              <div className="card-top">
-                <Icon type="euro" className="text-primary" />
-              </div>
-              <div className="card-info">
-                <span>Revenue this month</span>
-              </div>
-              <div className="card-bottom">
-                <span>
-                  {currencyFormatter.format(1200, {
-                    style: "currency",
-                    code: "EUR"
-                  })}
-                </span>
-              </div>
-            </div>
-          </Col>{" "}
-          <Col className="p-2" xs={24} md={12} lg={8}>
-            <div className="number-card-v1 mb-4 ">
-              <div className="box box-default">
-                <div className="box-header">Next check in/on</div>
-                <div
-                  className="box-body"
-                  style={{
-                    padding: "0 1.25rem"
-                  }}
-                >
-                  <List
-                    itemLayout="horizontal"
-                    dataSource={list.checks}
-                    renderItem={item => (
-                      <List.Item
-                        style={{
-                          padding: "5px 0"
-                        }}
-                      >
-                        <div className="list-style-v1">
-                          <div className="list-item">
-                            <div className="list-item__body">
-                              <div className="list-item__title d-flex justify-content-between">
-                                <SpanName>{item.name}</SpanName>
-                                {item.type === "out" && (
-                                  <Tag color="#f50">{item.type}</Tag>
-                                )}
-                                {item.type === "in" && (
-                                  <Tag color="#87d068">{item.type}</Tag>
-                                )}
-                                <span>{item.datetime}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </List.Item>
-                    )}
-                  />
-                </div>
-              </div>
-            </div>
-          </Col>{" "}
+          <Col xs={24} md={6} className="p-2">
+            <article className="img-card-v1 mb-4" style={{ height: "340px" }}>
+              <div
+                className="img-card__cover"
+                style={{
+                  backgroundImage: `url('${IMAGE}')`
+                }}
+              ></div>
+            </article>
+          </Col>
+          <Col xs={24} md={18} className="p-2">
+            <Card style={{ minHeight: 340 }}>
+              <Row>
+                <Col>
+                  <Title underline level={4}>
+                    Your assigned tasks
+                  </Title>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <Table size="small" dataSource={tasks} columns={columns} />
+                </Col>
+              </Row>
+            </Card>
+          </Col>
         </Row>
-      </Col>
-    </Row>
+      </article>
+    </div>
   );
 };
 
