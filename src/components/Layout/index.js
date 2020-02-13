@@ -38,11 +38,10 @@ const AppLayout = props => {
 
   return (
     <LayoutWrapper style={{ minHeight: "100vh" }}>
-      {user.role !== "evaluator" && (
+      {user.role === "admin" && (
         <Sider collapsed={collapsed} onCollapse={onCollapse}>
           <div className="logo" />
           {user.role === "admin" && <AdminMenu />}
-          {user.role === "pm" && <ManagerMenu />}
         </Sider>
       )}
       <Layout>
@@ -51,7 +50,7 @@ const AppLayout = props => {
           <Location>
             {({ location }) => {
               let words = location.pathname.split("/");
-              if (user.role !== "evaluator") {
+              if (user.role === "admin") {
                 return (
                   <Breadcrumb style={{ margin: "16px 0" }}>
                     {words.map((item, i) => {

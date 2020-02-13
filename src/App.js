@@ -44,8 +44,8 @@ export const App = () => {
             <Users path="users" />
           </Admin>
           <Manager path="project-manager">
-            <DashboardManager path="/" />
-            <Projects path="projects" />
+            {/* <DashboardManager path="/" /> */}
+            <Projects path="/" />
           </Manager>
           <Evaluator path="evaluator">
             <DashboardEvaluator path="/" />

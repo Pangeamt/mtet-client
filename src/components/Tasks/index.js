@@ -9,7 +9,10 @@ import {
   List,
   Typography,
   Progress,
-  Icon
+  Icon,
+  Card,
+  Tooltip,
+  Popconfirm
 } from "antd";
 import axios from "axios";
 import { HOST_API } from "./../../config";
@@ -25,6 +28,7 @@ const Tasks = ({ project }) => {
   const tuvs = project.Tuvs || [];
 
   const [visible, setVisible] = useState(false);
+  const [visibleForm, setVisibleForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingActive, setLoadingActive] = useState(false);
   const [evaluators, setEvaluators] = useState([]);
@@ -71,24 +75,15 @@ const Tasks = ({ project }) => {
     }
   };
 
-  const active = async (record, value) => {
+  const remove = async (record, value) => {
     try {
       setLoadingActive(`load-${record.id}`);
       axios.defaults.headers.common["x-access-token"] = token;
-      const {
-        data: { doc }
-      } = await axios({
-        method: "patch",
-        url: `${HOST_API}/v1/tasks/${record.id}`,
-        data: { active: value }
+      await axios({
+        method: "delete",
+        url: `${HOST_API}/v1/tasks/${record.id}`
       });
-      const ntasks = tasks.map(item => {
-        if (item.id === record.id) {
-          item.active = doc.active;
-        }
-        return item;
-      });
-      setTasks(ntasks);
+      fetch();
       setLoadingActive(false);
 
       message.success("Successful Action!");
@@ -100,6 +95,9 @@ const Tasks = ({ project }) => {
 
   const handleCancel = e => {
     setVisible(false);
+  };
+  const handleFormCancel = e => {
+    setVisibleForm(false);
   };
 
   const createTasks = (values, form) => {
@@ -218,7 +216,7 @@ const Tasks = ({ project }) => {
 
   const restart = async task => {
     try {
-      setLoadingActive(`assign-${task}`);
+      setLoadingActive(`restart-${task}`);
       axios.defaults.headers.common["x-access-token"] = token;
       await axios({
         method: "put",
@@ -261,50 +259,15 @@ const Tasks = ({ project }) => {
         } else {
           return (
             <Button
+              className="assign-e"
+              icon="plus"
               onClick={() => {
                 showModal(record);
               }}
-              type="primary"
               size="small"
             >
               Assign evaluator
             </Button>
-          );
-        }
-      }
-    },
-    {
-      title: "Active",
-      key: "active",
-      render: (text, record) => {
-        if (record.active) {
-          return (
-            <Button
-              disabled={!record.user}
-              onClick={() => {
-                active(record, false);
-              }}
-              loading={loadingActive === `load-${record.id}`}
-              icon="check"
-              type="primary"
-              shape="circle"
-              size="small"
-            ></Button>
-          );
-        } else {
-          return (
-            <Button
-              disabled={!record.user}
-              onClick={() => {
-                active(record, true);
-              }}
-              loading={loadingActive === `load-${record.id}`}
-              className="stop-button"
-              icon="stop"
-              type="danger"
-              shape="circle"
-              size="small"
-            ></Button>
           );
         }
       }
@@ -326,22 +289,45 @@ const Tasks = ({ project }) => {
     {
       title: "",
       key: "restart",
+      width: 100,
       render: (text, record) => {
-        if (record.active || record.user) {
-          return (
-            <Button
-              loading={loadingActive === `restart-${record.id}`}
-              onClick={() => {
-                restart(record.id);
+        return (
+          <React.Fragment>
+            <Popconfirm
+              onConfirm={() => {
+                remove(record, false);
               }}
-              type="danger"
-              size="small"
-              icon="reload"
+              title="Are you sure？"
+              okText="Yes"
+              cancelText="No"
             >
-              Restart
-            </Button>
-          );
-        }
+              <Button
+                className="ml-2 right"
+                loading={loadingActive === `load-${record.id}`}
+                icon="delete"
+                type="danger"
+                shape="circle"
+                size="small"
+              ></Button>
+            </Popconfirm>
+
+            {record.active ||
+              (record.user && (
+                <Tooltip placement="top" title="Restart Task">
+                  <Button
+                    className="right"
+                    loading={loadingActive === `restart-${record.id}`}
+                    onClick={() => {
+                      restart(record.id);
+                    }}
+                    shape="circle"
+                    size="small"
+                    icon="reload"
+                  ></Button>
+                </Tooltip>
+              ))}
+          </React.Fragment>
+        );
       }
     }
   ];
@@ -378,71 +364,21 @@ const Tasks = ({ project }) => {
   ];
   return (
     <Row>
-      <Col xs={24} md={12} className="p-2">
+      <Col xs={24} className="p-2">
+        <Button
+          style={{ float: "right", position: "relative", zIndex: 100 }}
+          className="mb-2"
+          size="small"
+          type="primary"
+          onClick={() => {
+            setVisibleForm(true);
+          }}
+        >
+          Create Tasks
+        </Button>
         <Table size="small" dataSource={tasks} columns={t_columns} />
       </Col>
-      <Col xs={24} md={12} className="p-2">
-        <Row>
-          <Col xs={24} md={16}>
-            <TaskForm
-              create={createTasks}
-              project={project}
-              tasks={collectionsTasks}
-            />
-          </Col>
-          <Col xs={24} md={8}>
-            {collectionsTasks.length > 0 && (
-              <Row>
-                <Col>
-                  <List
-                    size="small"
-                    header={<Title level={4}>New Tasks</Title>}
-                    bordered
-                    dataSource={collectionsTasks}
-                    renderItem={(item, i) => (
-                      <List.Item>
-                        <Row
-                          type="flex"
-                          justify="space-between"
-                          className="w-100"
-                        >
-                          <Col xs={4}>{i + 1}</Col>
-                          <Col xs={10}>
-                            #Tus: <Text underline>{item.tus.length}</Text>
-                          </Col>
-                          <Col xs={10}>
-                            #Tuvs: <Text underline>{item.tuvs}</Text>
-                          </Col>
-                        </Row>
-                      </List.Item>
-                    )}
-                  />
-                </Col>
-                <Col className="my-5">
-                  <Button
-                    className="ml-2"
-                    style={{ float: "right" }}
-                    type="primary"
-                    loading={loading}
-                    onClick={create}
-                  >
-                    Confirm
-                  </Button>
-                  <Button
-                    style={{ float: "right" }}
-                    type="danger"
-                    onClick={() => {
-                      setCollectionsTasks([]);
-                    }}
-                  >
-                    Clean
-                  </Button>
-                </Col>
-              </Row>
-            )}
-          </Col>
-        </Row>
-      </Col>
+
       <Modal
         title="Evaluators"
         visible={visible}
@@ -455,6 +391,87 @@ const Tasks = ({ project }) => {
           columns={e_columns}
           dataSource={evaluators}
         />
+      </Modal>
+      <Modal
+        footer={false}
+        title="Create Tasks"
+        visible={visibleForm}
+        onCancel={handleFormCancel}
+      >
+        <Row>
+          <Col xs={24} className="p-2">
+            <Row>
+              {collectionsTasks.length === 0 && (
+                <Col xs={24}>
+                  <TaskForm
+                    create={createTasks}
+                    project={project}
+                    tasks={collectionsTasks}
+                  />
+                </Col>
+              )}
+
+              {collectionsTasks.length > 0 && (
+                <Col xs={24} className="p-2">
+                  <Row
+                    style={{
+                      backgroundColor: "#f0f0ff",
+                      padding: "5px 10px"
+                    }}
+                  >
+                    <Col>
+                      <Card>
+                        <List
+                          size="small"
+                          header={<Title level={4}>New Tasks</Title>}
+                          bordered
+                          dataSource={collectionsTasks}
+                          renderItem={(item, i) => (
+                            <List.Item>
+                              <Row
+                                type="flex"
+                                justify="space-between"
+                                className="w-100"
+                              >
+                                <Col xs={4}>{i + 1}</Col>
+                                <Col xs={10}>
+                                  #Tus: <Text underline>{item.tus.length}</Text>
+                                </Col>
+                                <Col xs={10}>
+                                  #Tuvs: <Text underline>{item.tuvs}</Text>
+                                </Col>
+                              </Row>
+                            </List.Item>
+                          )}
+                        />
+                      </Card>
+                    </Col>
+                    <Col className="my-5">
+                      <Button
+                        className="ml-2"
+                        style={{ float: "right" }}
+                        type="primary"
+                        loading={loading}
+                        onClick={create}
+                      >
+                        Confirm
+                      </Button>
+                      <Button
+                        style={{ float: "right" }}
+                        type="danger"
+                        onClick={() => {
+                          setCollectionsTasks([]);
+                        }}
+                      >
+                        Clean
+                      </Button>
+                    </Col>
+                  </Row>
+                </Col>
+              )}
+            </Row>
+          </Col>
+        </Row>
       </Modal>
     </Row>
   );

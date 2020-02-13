@@ -32,11 +32,11 @@ const Section = props => {
       <div className="app-header-inner bg-white">
         <div
           className={
-            user.role === "evaluator" ? "container " : "header-by-role w-100"
+            user.role !== "admin" ? "container " : "header-by-role w-100"
           }
         >
           <div className="header-left">
-            {user.role !== "evaluator" && (
+            {user.role === "admin" && (
               <div
                 onClick={() => {
                   props.onCollapse(!props.collapsed);
