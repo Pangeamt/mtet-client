@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, Button, Popconfirm, Icon, Row, Col, Typography } from "antd";
+import { Table, Button, Popconfirm, Icon, Tooltip, Typography } from "antd";
 
 import styled from "styled-components";
 
@@ -108,27 +108,10 @@ const ProjectsList = ({
       fixed: "right",
       render: (text, record) => (
         <React.Fragment>
-          <ButtonActions
-            onClick={() => {
-              showsTasks(record);
-            }}
-            shape="circle"
-            size="small"
-          >
-            <img
-              style={{
-                width: 15,
-                height: 15,
-                margin: "-4px 0px 0 0px"
-              }}
-              src={TASKS}
-              alt=""
-            />
-          </ButtonActions>
-          {record.Tuvs && record.Tuvs.length > 0 && (
+          <Tooltip placement="top" title="Tasks">
             <ButtonActions
               onClick={() => {
-                showsTuvs(record);
+                showsTasks(record);
               }}
               shape="circle"
               size="small"
@@ -139,43 +122,73 @@ const ProjectsList = ({
                   height: 15,
                   margin: "-4px 0px 0 0px"
                 }}
-                src={TUVS}
+                src={TASKS}
                 alt=""
               />
             </ButtonActions>
-          )}
-          {record.Tuvs && record.Tuvs.length === 0 && (
-            <ButtonActions
-              shape="circle"
-              icon="loading"
-              size="small"
-            ></ButtonActions>
-          )}
-          <ButtonActions
-            onClick={() => {
-              select(record);
-            }}
-            disabled={record.Tasks && record.Tasks.length > 0}
-            type="primary"
-            shape="circle"
-            icon="edit"
-            size="small"
-          />
+          </Tooltip>
 
-          <Popconfirm
-            title="Are you sure？"
-            onConfirm={() => {
-              remove(record);
-            }}
-            icon={<Icon type="question-circle-o" style={{ color: "red" }} />}
-          >
+          {record.Tuvs && record.Tuvs.length > 0 && (
+            <Tooltip placement="top" title="Tuvs">
+              <ButtonActions
+                onClick={() => {
+                  showsTuvs(record);
+                }}
+                shape="circle"
+                size="small"
+              >
+                <img
+                  style={{
+                    width: 15,
+                    height: 15,
+                    margin: "-4px 0px 0 0px"
+                  }}
+                  src={TUVS}
+                  alt=""
+                />
+              </ButtonActions>
+            </Tooltip>
+          )}
+
+          {record.Tuvs && record.Tuvs.length === 0 && (
+            <Tooltip placement="top" title="Tuvs">
+              <ButtonActions
+                shape="circle"
+                icon="loading"
+                size="small"
+              ></ButtonActions>
+            </Tooltip>
+          )}
+
+          <Tooltip placement="top" title="Edit">
             <ButtonActions
-              type="danger"
+              onClick={() => {
+                select(record);
+              }}
+              disabled={record.Tasks && record.Tasks.length > 0}
+              type="primary"
               shape="circle"
-              icon="delete"
+              icon="edit"
               size="small"
             />
-          </Popconfirm>
+          </Tooltip>
+
+          <Tooltip placement="top" title="Delete">
+            <Popconfirm
+              title="Are you sure？"
+              onConfirm={() => {
+                remove(record);
+              }}
+              icon={<Icon type="question-circle-o" style={{ color: "red" }} />}
+            >
+              <ButtonActions
+                type="danger"
+                shape="circle"
+                icon="delete"
+                size="small"
+              />
+            </Popconfirm>
+          </Tooltip>
         </React.Fragment>
       )
     }
