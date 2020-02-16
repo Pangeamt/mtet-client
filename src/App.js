@@ -12,11 +12,11 @@ import DashboardAdmin from "./pages/Admin/Dashboard";
 import Users from "./pages/Admin/Users";
 
 import { Manager } from "./pages/Manager";
-import DashboardManager from "./pages/Manager/Dashboard";
 import Projects from "./pages/Manager/Projects";
 
 import { Evaluator } from "./pages/Evaluator";
 import DashboardEvaluator from "./pages/Evaluator/Dashboard";
+import Tasks from "./pages/Evaluator/Tasks";
 
 import { AppContext } from "./AppContext";
 
@@ -44,12 +44,11 @@ export const App = () => {
             <Users path="users" />
           </Admin>
           <Manager path="project-manager">
-            {/* <DashboardManager path="/" /> */}
             <Projects path="/" />
           </Manager>
           <Evaluator path="evaluator">
             <DashboardEvaluator path="/" />
-            {/* <BankAccounts path="bank-accounts" /> */}
+            <Tasks path="/tasks/:id" />
           </Evaluator>
         </Router>
       </React.Fragment>

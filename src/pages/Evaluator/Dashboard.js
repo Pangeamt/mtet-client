@@ -10,53 +10,13 @@ import {
   Card
 } from "antd";
 import axios from "axios";
+import { navigate } from "@reach/router";
 
 import { HOST_API } from "./../../config";
 import { AppContext } from "./../../AppContext";
 import IMAGE from "./undraw_body_text_l3ld.png";
 
 const { Title } = Typography;
-
-const columns = [
-  {
-    title: "TaskId",
-    dataIndex: "TaskId",
-    key: "TaskId"
-  },
-  {
-    title: "Tuvs",
-    key: "tuvs",
-    render: (text, record) => {
-      return <span>{record.total}</span>;
-    }
-  },
-  {
-    title: "Complete",
-    key: "complete",
-    render: (text, record) => {
-      return <span>{record.complete}</span>;
-    }
-  },
-  {
-    title: "Progress",
-    key: "complete",
-    render: (text, record) => {
-      return <Progress percent={(record.complete * 100) / record.total} />;
-    }
-  },
-  {
-    title: "",
-    key: "address",
-    width: 100,
-    render: (text, record) => {
-      return (
-        <Button style={{ width: 80 }} type="primary" size="small">
-          {record.complete > 0 ? "Continue" : "Start"}
-        </Button>
-      );
-    }
-  }
-];
 
 const Dashboard = () => {
   const { user, token } = useContext(AppContext);
@@ -76,6 +36,62 @@ const Dashboard = () => {
       message.error(error.message);
     }
   };
+
+  const goToTask = task => {
+    navigate(`/evaluator/tasks/${task.id}`);
+  };
+
+  const columns = [
+    {
+      title: "TaskId",
+      dataIndex: "TaskId",
+      key: "TaskId"
+    },
+    {
+      title: "Tuvs",
+      key: "tuvs",
+      render: (text, record) => {
+        return <span>{record.total}</span>;
+      }
+    },
+    {
+      title: "Complete",
+      key: "complete",
+      render: (text, record) => {
+        return <span>{record.complete}</span>;
+      }
+    },
+    {
+      title: "Progress",
+      key: "complete",
+      render: (text, record) => {
+        return (
+          <Progress
+            percent={parseInt((record.complete * 100) / record.total)}
+          />
+        );
+      }
+    },
+    {
+      title: "",
+      key: "address",
+      width: 100,
+      render: (text, record) => {
+        return (
+          <Button
+            onClick={() => {
+              goToTask(record);
+            }}
+            style={{ width: 80 }}
+            type="primary"
+            size="small"
+          >
+            {record.complete > 0 ? "Continue" : "Start"}
+          </Button>
+        );
+      }
+    }
+  ];
 
   return (
     <div className="container mt-5">

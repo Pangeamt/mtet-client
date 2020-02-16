@@ -63,6 +63,7 @@ const Tasks = ({ project }) => {
 
   const fetch = async () => {
     try {
+      setLoading(true);
       axios.defaults.headers.common["x-access-token"] = token;
       const { data } = await axios.get(`${HOST_API}/v1/tasks`, {
         params: {
@@ -70,8 +71,11 @@ const Tasks = ({ project }) => {
         }
       });
       setTasks(data);
+      setLoadingActive(false);
+      setLoading(false);
     } catch (error) {
       message.error(error.message);
+      setLoading(true);
     }
   };
 
@@ -84,7 +88,6 @@ const Tasks = ({ project }) => {
         url: `${HOST_API}/v1/tasks/${record.id}`
       });
       fetch();
-      setLoadingActive(false);
 
       message.success("Successful Action!");
     } catch (error) {
@@ -184,8 +187,8 @@ const Tasks = ({ project }) => {
       });
 
       setCollectionsTasks([]);
+      setVisibleForm(false);
       fetch();
-      setLoading(false);
 
       message.success("Successful Action!");
     } catch (error) {
@@ -270,6 +273,46 @@ const Tasks = ({ project }) => {
             </Button>
           );
         }
+      }
+    },
+    {
+      title: "Source",
+      key: "showSourceText",
+      dataIndex: "showSourceText",
+      render: text => {
+        return (
+          <span>
+            {text ? (
+              <Icon type="eye" theme="twoTone" twoToneColor="#52c41a" />
+            ) : (
+              <Icon
+                type="eye-invisible"
+                theme="twoTone"
+                twoToneColor="#eb2f96"
+              />
+            )}
+          </span>
+        );
+      }
+    },
+    {
+      title: "Reference",
+      key: "showReferenceText",
+      dataIndex: "showReferenceText",
+      render: text => {
+        return (
+          <span>
+            {text ? (
+              <Icon type="eye" theme="twoTone" twoToneColor="#52c41a" />
+            ) : (
+              <Icon
+                type="eye-invisible"
+                theme="twoTone"
+                twoToneColor="#eb2f96"
+              />
+            )}
+          </span>
+        );
       }
     },
     {
@@ -366,6 +409,7 @@ const Tasks = ({ project }) => {
     <Row>
       <Col xs={24} className="p-2">
         <Button
+          disabled={loading}
           style={{ float: "right", position: "relative", zIndex: 100 }}
           className="mb-2"
           size="small"
@@ -376,7 +420,12 @@ const Tasks = ({ project }) => {
         >
           Create Tasks
         </Button>
-        <Table size="small" dataSource={tasks} columns={t_columns} />
+        <Table
+          loading={loading}
+          size="small"
+          dataSource={tasks}
+          columns={t_columns}
+        />
       </Col>
 
       <Modal
@@ -457,13 +506,14 @@ const Tasks = ({ project }) => {
                         Confirm
                       </Button>
                       <Button
+                        disabled={loading}
                         style={{ float: "right" }}
                         type="danger"
                         onClick={() => {
                           setCollectionsTasks([]);
                         }}
                       >
-                        Clean
+                        Cancel
                       </Button>
                     </Col>
                   </Row>
