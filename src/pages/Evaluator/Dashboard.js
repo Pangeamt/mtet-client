@@ -10,6 +10,7 @@ import {
   Card
 } from "antd";
 import axios from "axios";
+import numeral from "numeral";
 import { navigate } from "@reach/router";
 
 import { HOST_API } from "./../../config";
@@ -21,6 +22,7 @@ const { Title } = Typography;
 const Dashboard = () => {
   const { user, token } = useContext(AppContext);
 
+  const [loading, setLoading] = useState(false);
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
@@ -29,11 +31,14 @@ const Dashboard = () => {
 
   const fetch = async () => {
     try {
+      setLoading(true);
       axios.defaults.headers.common["x-access-token"] = token;
       const { data } = await axios.get(`${HOST_API}/v1/tasks/evaluator`);
       setTasks(data);
+      setLoading(false);
     } catch (error) {
       message.error(error.message);
+      setLoading(false);
     }
   };
 
@@ -46,6 +51,13 @@ const Dashboard = () => {
       title: "TaskId",
       dataIndex: "TaskId",
       key: "TaskId"
+    },
+    {
+      title: "Project",
+      key: "project",
+      render: (text, record) => {
+        return <span>{record.project.name}</span>;
+      }
     },
     {
       title: "Tuvs",
@@ -67,7 +79,9 @@ const Dashboard = () => {
       render: (text, record) => {
         return (
           <Progress
-            percent={parseInt((record.complete * 100) / record.total)}
+            percent={numeral((record.complete * 100) / record.total).format(
+              "0.00"
+            )}
           />
         );
       }
@@ -75,10 +89,11 @@ const Dashboard = () => {
     {
       title: "",
       key: "address",
-      width: 100,
+      width: 120,
       render: (text, record) => {
         return (
           <Button
+            className="right"
             onClick={() => {
               goToTask(record);
             }}
@@ -131,7 +146,12 @@ const Dashboard = () => {
               </Row>
               <Row>
                 <Col>
-                  <Table size="small" dataSource={tasks} columns={columns} />
+                  <Table
+                    loading={loading}
+                    size="small"
+                    dataSource={tasks}
+                    columns={columns}
+                  />
                 </Col>
               </Row>
             </Card>

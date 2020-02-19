@@ -1,223 +1,150 @@
 import React, { useState, useEffect, useContext } from "react";
-import { navigate } from "@reach/router";
+import { Link } from "@reach/router";
 import {
   Card,
-  Table,
-  Tabs,
+  Pagination,
   message,
-  Slider,
-  InputNumber,
-  Button,
+  Spin,
+  Divider,
+  Typography,
+  Icon,
   Row,
-  Col,
-  Typography
+  Col
 } from "antd";
 import axios from "axios";
+import styled from "styled-components";
 
+import Tu from "./../../components/Tu";
 import { AppContext } from "./../../AppContext";
 import { HOST_API } from "./../../config";
 
-const { Text } = Typography;
-const { TabPane } = Tabs;
+const { Text, Title } = Typography;
+
+const TextLink = styled(Text)`
+  cursor: pointer;
+
+  &:hover {
+    color: #1890ff;
+    text-decoration: underline;
+    font-weight: 500;
+  }
+`;
 
 const Tasks = ({ id }) => {
   const { token } = useContext(AppContext);
 
-  const [defaultCurrent, setDefaultCurrent] = useState(0);
+  const [current, setCurrent] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [loadingEvs, setLoadingEvs] = useState([]);
   const [tuvs, setTuvs] = useState([]);
   const [task, setTask] = useState(null);
+  const [tu, setTu] = useState(null);
 
   useEffect(() => {
     fetch();
   }, []);
 
-  const fetch = async () => {
+  const fetch = async (restart = true) => {
     try {
+      setLoading(true);
       axios.defaults.headers.common["x-access-token"] = token;
       const {
         data: { docs, task }
       } = await axios.get(`${HOST_API}/v1/tasks/${id}`);
+
       setTuvs(docs);
       setTask(task);
 
-      let fp = 0;
-      for (let i = 0; i < docs.length; i++) {
-        if (!docs[i].complete) {
-          fp = i;
-          break;
+      if (docs.length && restart) {
+        let stop = 0;
+        for (let i = 0; i < docs.length; i++) {
+          let complete = true;
+          for (let j = 0; j < docs[i].tuvs.length; j++) {
+            if (!docs[i].tuvs[j].complete) {
+              stop = i;
+              complete = false;
+              break;
+            }
+          }
+          if (!complete) break;
         }
+        setTu(docs[stop]);
+        setCurrent(stop + 1);
       }
-      let _pag = parseInt(fp / 10) + 1;
-      setDefaultCurrent(_pag);
 
       setLoading(false);
     } catch (error) {
+      setLoading(false);
       message.error(error.message);
     }
   };
 
-  const modifyValue = (record, value) => {
-    const q = tuvs.map(elem => {
-      if (elem.id === record.id) {
-        elem.value = value;
-      }
-      return elem;
-    });
-    setTuvs(q);
-  };
-
-  const addLoading = id => {
-    const nameL = `save-${id}`;
-    const le = loadingEvs;
-    le.push(nameL);
-    setLoadingEvs(le);
-  };
-
-  const delLoading = id => {
-    const nameL = `save-${id}`;
-    const le = loadingEvs.filter(item => item !== nameL);
-    setLoadingEvs(le);
-  };
-
-  const isLoading = id => {
-    const nameL = `save-${id}`;
-    const le = loadingEvs.filter(item => item !== nameL);
-    if (le && le.length) return true;
-    return false;
-  };
-
-  const save = async record => {
+  const save = async values => {
+    message.loading("Action in progress..", 0);
     try {
-      addLoading(record.id);
+      // Dismiss manually and asynchronously
+
       axios.defaults.headers.common["x-access-token"] = token;
       await axios({
-        method: "patch",
-        url: `${HOST_API}/v1/tasks/evaluation/${record.id}`,
-        data: { value: record.value }
+        method: "post",
+        url: `${HOST_API}/v1/tasks/evaluation/save`,
+        data: { values }
       });
 
-      const q = tuvs.map(elem => {
-        if (elem.id === record.id) {
-          elem.complete = true;
-        }
-        return elem;
-      });
-      setTuvs(q);
-      delLoading(record.id);
+      fetch(false);
+      message.destroy();
+      nextPage();
+      message.success("Successful Action!");
     } catch (error) {
+      message.destroy();
       message.error(error.message);
     }
   };
 
-  const columns = [
-    {
-      title: "From",
-      dataIndex: "from",
-      key: "from"
-    },
-    {
-      title: "Source",
-      dataIndex: "source",
-      key: "source",
-      render: text => {
-        if (task && task.showSourceText) {
-          return <span>{text}</span>;
-        } else {
-          return <span>---</span>;
-        }
-      }
-    },
-    {
-      title: "Reference",
-      dataIndex: "reference",
-      key: "reference",
-      render: text => {
-        if (task && task.showReferenceText) {
-          return <span>{text}</span>;
-        } else {
-          return <span>---</span>;
-        }
-      }
-    },
-    {
-      title: "Text",
-      dataIndex: "text",
-      key: "text",
-      render: text => {
-        return (
-          <span>
-            <Text code>{text}</Text>
-          </span>
-        );
-      }
-    },
-    {
-      title: "Value",
-      dataIndex: "value",
-      key: "value",
-      render: (text, record) => {
-        return (
-          <Row>
-            <Col span={12}>
-              <Slider
-                disabled={record.complete}
-                min={0}
-                max={100}
-                onChange={e => {
-                  modifyValue(record, e);
-                }}
-                value={parseInt(text)}
-              />
-            </Col>
-            <Col span={4}>
-              <InputNumber
-                disabled={record.complete}
-                min={0}
-                max={100}
-                style={{ marginLeft: 16 }}
-                value={parseInt(text)}
-                onChange={e => {
-                  modifyValue(record, e);
-                }}
-              />
-            </Col>
-            <Col span={4}>
-              {!record.complete && (
-                <Button
-                  loading={isLoading(record.id)}
-                  type="primary"
-                  size="small"
-                  icon="save"
-                  style={{ float: "right", margin: "5px 0px 0 0" }}
-                  onClick={() => {
-                    save(record);
-                  }}
-                />
-              )}
-            </Col>
-          </Row>
-        );
-      }
-    }
-  ];
+  const onChange = pageNumber => {
+    setCurrent(pageNumber);
+    setTu(tuvs[pageNumber - 1]);
+  };
+
+  const nextPage = () => {
+    setCurrent(current + 1);
+    setTu(tuvs[current]);
+  };
 
   return (
     <div className="container mt-5">
       <Card>
-        <Tabs defaultActiveKey="tuvs">
-          <TabPane tab="Tuvs" key="tuvs">
-            <Table
-              key={defaultCurrent}
-              loading={loading}
-              size="small"
-              dataSource={tuvs}
-              columns={columns}
-              pagination={{ defaultCurrent }}
-            />
-          </TabPane>
-        </Tabs>
+        <Row>
+          <Col xs={24} md={12}>
+            <Title level={4}>
+              {task ? `${task.project.name} (TaskId ${task.id})` : null}
+            </Title>
+          </Col>
+          <Col xs={24} md={12}>
+            <Link className="right" to="/evaluator">
+              {" "}
+              <TextLink>
+                {" "}
+                <Icon type="arrow-left" /> Tasks
+              </TextLink>
+            </Link>{" "}
+          </Col>
+        </Row>
+        <Spin spinning={loading}>
+          {tu && (
+            <React.Fragment>
+              <Tu task={task} key={tu.tuId} tu={tu} save={save}></Tu>
+            </React.Fragment>
+          )}
+          <Divider />
+          <Pagination
+            key={current}
+            defaultCurrent={current}
+            className="mt-4 right"
+            pageSize={1}
+            total={tuvs.length}
+            onChange={onChange}
+          />
+        </Spin>
       </Card>
     </div>
   );
