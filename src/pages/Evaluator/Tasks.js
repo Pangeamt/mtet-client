@@ -11,6 +11,7 @@ import {
   Row,
   Col
 } from "antd";
+import { navigate } from "@reach/router";
 import axios from "axios";
 import styled from "styled-components";
 
@@ -75,6 +76,9 @@ const Tasks = ({ id }) => {
     } catch (error) {
       setLoading(false);
       message.error(error.message);
+      if (error.message === "Request failed with status code 401") {
+        navigate(`/evaluator`);
+      }
     }
   };
 
@@ -87,7 +91,7 @@ const Tasks = ({ id }) => {
       await axios({
         method: "post",
         url: `${HOST_API}/v1/tasks/evaluation/save`,
-        data: { values }
+        data: { values, task: task.id }
       });
 
       fetch(false);
@@ -97,6 +101,9 @@ const Tasks = ({ id }) => {
     } catch (error) {
       message.destroy();
       message.error(error.message);
+      if (error.message === "Request failed with status code 401") {
+        navigate(`/evaluator`);
+      }
     }
   };
 
@@ -106,8 +113,14 @@ const Tasks = ({ id }) => {
   };
 
   const nextPage = () => {
-    setCurrent(current + 1);
-    setTu(tuvs[current]);
+    if (current >= tuvs.length) {
+      setCurrent(1);
+      setTu(tuvs[0]);
+      navigate(`/evaluator`);
+    } else {
+      setCurrent(current + 1);
+      setTu(tuvs[current]);
+    }
   };
 
   return (
@@ -115,9 +128,13 @@ const Tasks = ({ id }) => {
       <Card>
         <Row>
           <Col xs={24} md={12}>
-            <Title level={4}>
-              {task ? `${task.project.name} (TaskId ${task.id})` : null}
-            </Title>
+            <Text underline strong>
+              {task
+                ? `${task.project.name} (TaskId ${task.id} ${
+                    tu ? `/ TuId ${tu.tuId}` : null
+                  })`
+                : null}
+            </Text>
           </Col>
           <Col xs={24} md={12}>
             <Link className="right" to="/evaluator">

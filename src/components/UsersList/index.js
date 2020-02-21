@@ -37,7 +37,7 @@ const UsersList = ({ loading, users, remove, select, showPassForm }) => {
               select(record);
             }}
             type="primary"
-            shape="circle"
+            
             icon="edit"
             size="small"
           />
@@ -46,7 +46,7 @@ const UsersList = ({ loading, users, remove, select, showPassForm }) => {
               showPassForm(record);
             }}
             type="primary"
-            shape="circle"
+            
             icon="safety-certificate"
             size="small"
           />
@@ -59,7 +59,7 @@ const UsersList = ({ loading, users, remove, select, showPassForm }) => {
           >
             <ButtonActions
               type="danger"
-              shape="circle"
+              
               icon="delete"
               size="small"
             />

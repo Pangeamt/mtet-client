@@ -8,3 +8,7 @@
 .assign-e .anticon {
   color: #1890ff;
 }
+
+.anticon {
+  margin: -2px 0px 0 0px;
+}

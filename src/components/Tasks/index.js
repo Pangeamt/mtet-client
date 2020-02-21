@@ -18,6 +18,7 @@ import axios from "axios";
 import { HOST_API } from "./../../config";
 import { AppContext } from "./../../AppContext";
 import TaskForm from "./../TaskForm";
+import numeral from "numeral";
 
 import "./style.css";
 
@@ -25,7 +26,7 @@ const { Title, Text } = Typography;
 
 const Tasks = ({ project }) => {
   const { token } = useContext(AppContext);
-  const tuvs = project.Tuvs || [];
+  const tuvs = project.projects || [];
 
   const [visible, setVisible] = useState(false);
   const [visibleForm, setVisibleForm] = useState(false);
@@ -236,6 +237,25 @@ const Tasks = ({ project }) => {
     }
   };
 
+  const active = async task => {
+    try {
+      setLoadingActive(`active-${task}`);
+      axios.defaults.headers.common["x-access-token"] = token;
+      await axios({
+        method: "patch",
+        url: `${HOST_API}/v1/tasks/${task}`
+      });
+
+      fetch();
+      setLoadingActive(false);
+      handleCancel();
+      message.success("Successful Action!");
+    } catch (error) {
+      message.error(error.message);
+      setLoadingActive(false);
+    }
+  };
+
   const showModal = selected => {
     setSelectedTask(selected);
     setVisible(true);
@@ -253,11 +273,25 @@ const Tasks = ({ project }) => {
       render: (text, record) => {
         if (record.user) {
           return (
-            <span>
-              {`${record.user.nickname.toUpperCase()}`}
-              <br />
-              <Icon type="mail" /> {record.user.email}
-            </span>
+            <Row>
+              <Col xs={20}>
+                {`${record.user.nickname.toUpperCase()}`}
+                <br />
+                <Icon type="mail" /> {record.user.email}
+              </Col>
+              <Col xs={4}>
+                <Button
+                  style={{
+                    marginTop: 10
+                  }}
+                  onClick={() => {
+                    showModal(record);
+                  }}
+                  icon="user"
+                  size="small"
+                ></Button>
+              </Col>
+            </Row>
           );
         } else {
           return (
@@ -276,12 +310,23 @@ const Tasks = ({ project }) => {
       }
     },
     {
-      title: "Source",
-      key: "showSourceText",
+      title: "Source/Reference",
+      width: 140,
       dataIndex: "showSourceText",
-      render: text => {
+      render: (text, record) => {
         return (
-          <span>
+          <div>
+            &nbsp;&nbsp;
+            {record.showReferenceText ? (
+              <Icon type="eye" theme="twoTone" twoToneColor="#52c41a" />
+            ) : (
+              <Icon
+                type="eye-invisible"
+                theme="twoTone"
+                twoToneColor="#eb2f96"
+              />
+            )}
+            &nbsp;/&nbsp;
             {text ? (
               <Icon type="eye" theme="twoTone" twoToneColor="#52c41a" />
             ) : (
@@ -291,39 +336,21 @@ const Tasks = ({ project }) => {
                 twoToneColor="#eb2f96"
               />
             )}
-          </span>
+          </div>
         );
       }
     },
+
     {
-      title: "Reference",
-      key: "showReferenceText",
-      dataIndex: "showReferenceText",
-      render: text => {
-        return (
-          <span>
-            {text ? (
-              <Icon type="eye" theme="twoTone" twoToneColor="#52c41a" />
-            ) : (
-              <Icon
-                type="eye-invisible"
-                theme="twoTone"
-                twoToneColor="#eb2f96"
-              />
-            )}
-          </span>
-        );
-      }
-    },
-    {
-      title: "Complete",
+      title: "Complete %",
       key: "complete",
       render: (text, record) => {
         return (
           <span>
             <Progress
-              percent={(100 * record.complete) / record.total}
-              status="active"
+              percent={numeral((record.complete * 100) / record.total).format(
+                "0.00"
+              )}
             />
           </span>
         );
@@ -332,43 +359,52 @@ const Tasks = ({ project }) => {
     {
       title: "",
       key: "restart",
-      width: 100,
+      width: 120,
       render: (text, record) => {
         return (
           <React.Fragment>
-            <Popconfirm
-              onConfirm={() => {
-                remove(record, false);
-              }}
-              title="Are you sure？"
-              okText="Yes"
-              cancelText="No"
-            >
+            {!record.active && (
+              <Popconfirm
+                onConfirm={() => {
+                  remove(record, false);
+                }}
+                title="Are you sure？"
+                okText="Yes"
+                cancelText="No"
+              >
+                <Button
+                  className="ml-2 right"
+                  loading={loadingActive === `load-${record.id}`}
+                  icon="delete"
+                  type="danger"
+                  size="small"
+                ></Button>
+              </Popconfirm>
+            )}
+
+            <Tooltip placement="top" title="Restart Task">
               <Button
                 className="ml-2 right"
-                loading={loadingActive === `load-${record.id}`}
-                icon="delete"
-                type="danger"
-                shape="circle"
+                loading={loadingActive === `restart-${record.id}`}
+                onClick={() => {
+                  restart(record.id);
+                }}
                 size="small"
+                icon="reload"
               ></Button>
-            </Popconfirm>
-
-            {record.active ||
-              (record.user && (
-                <Tooltip placement="top" title="Restart Task">
-                  <Button
-                    className="right"
-                    loading={loadingActive === `restart-${record.id}`}
-                    onClick={() => {
-                      restart(record.id);
-                    }}
-                    shape="circle"
-                    size="small"
-                    icon="reload"
-                  ></Button>
-                </Tooltip>
-              ))}
+            </Tooltip>
+            <Tooltip placement="top" title="Activate/Deactivate Task">
+              <Button
+                className="right"
+                loading={loadingActive === `active-${record.id}`}
+                onClick={() => {
+                  active(record.id);
+                }}
+                size="small"
+                type={record.active ? "primary" : "danger"}
+                icon={record.active ? "check" : "close"}
+              ></Button>
+            </Tooltip>
           </React.Fragment>
         );
       }
@@ -379,7 +415,10 @@ const Tasks = ({ project }) => {
     {
       title: "Nickname",
       dataIndex: "nickname",
-      key: "nickname"
+      key: "nickname",
+      render: text => {
+        return <span className="text-capitalize">{text}</span>;
+      }
     },
     {
       title: "Email",
@@ -392,6 +431,9 @@ const Tasks = ({ project }) => {
       render: (text, record) => {
         return (
           <Button
+            disabled={
+              selectedTask.user ? record.id === selectedTask.user.id : false
+            }
             loading={loadingActive === `assign-${record.id}`}
             onClick={() => {
               assign(record.id);

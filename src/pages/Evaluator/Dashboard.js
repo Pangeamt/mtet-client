@@ -46,6 +46,25 @@ const Dashboard = () => {
     navigate(`/evaluator/tasks/${task.id}`);
   };
 
+  const finish = async task => {
+    try {
+      setLoading(true);
+      axios.defaults.headers.common["x-access-token"] = token;
+      await axios({
+        method: "patch",
+        url: `${HOST_API}/v1/tasks/${task.id}`,
+        data: { finish: true }
+      });
+
+      fetch();
+
+      message.success("Successful Action!");
+    } catch (error) {
+      message.error(error.message);
+      setLoading(false);
+    }
+  };
+
   const columns = [
     {
       title: "TaskId",
@@ -89,20 +108,35 @@ const Dashboard = () => {
     {
       title: "",
       key: "address",
-      width: 120,
+      width: 200,
       render: (text, record) => {
         return (
-          <Button
-            className="right"
-            onClick={() => {
-              goToTask(record);
-            }}
-            style={{ width: 80 }}
-            type="primary"
-            size="small"
-          >
-            {record.complete > 0 ? "Continue" : "Start"}
-          </Button>
+          <React.Fragment>
+            {record.complete === record.total && (
+              <Button
+                className="right ml-2"
+                onClick={() => {
+                  finish(record);
+                }}
+                style={{ width: 80 }}
+                type="primary"
+                size="small"
+              >
+                Finish
+              </Button>
+            )}
+            <Button
+              className="right"
+              onClick={() => {
+                goToTask(record);
+              }}
+              style={{ width: 80 }}
+              type="primary"
+              size="small"
+            >
+              {record.complete > 0 ? "Continue" : "Start"}
+            </Button>
+          </React.Fragment>
         );
       }
     }

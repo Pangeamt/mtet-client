@@ -1,5 +1,7 @@
 import React from "react";
 import { Form, Input, Button } from "antd";
+
+import LOGO from "./../../assets/NTEU_MTET.jpg";
 const FormItem = Form.Item;
 
 const LoginForm = ({ form, loading, login }) => {
@@ -16,7 +18,9 @@ const LoginForm = ({ form, loading, login }) => {
   const { getFieldDecorator } = form;
   return (
     <section className="form-v1-container">
-      <h2>LOGO</h2>
+      <div className="logo-container">
+        <img src={LOGO} alt="" />
+      </div>
 
       <Form onSubmit={handleSubmit} className="form-v1">
         <Form.Item label="E-mail">

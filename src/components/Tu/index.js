@@ -9,7 +9,9 @@ import {
   Button
 } from "antd";
 
-const { Title, Paragraph } = Typography;
+import EventListener, { withOptions } from "react-event-listener";
+
+const { Text, Paragraph } = Typography;
 
 const Tuv = ({ item, saveValue }) => {
   const [tuv, setTuv] = useState(null);
@@ -33,7 +35,7 @@ const Tuv = ({ item, saveValue }) => {
         <React.Fragment>
           <Col xs={24}>
             <Paragraph
-              className="p-3 "
+              className="p-1"
               style={{
                 backgroundColor: "#f0f2f5"
               }}
@@ -42,7 +44,7 @@ const Tuv = ({ item, saveValue }) => {
             </Paragraph>
           </Col>
           <Col xs={24}>
-            <Row className="p-2 ">
+            <Row className="p-1">
               <Col span={12}>
                 <Slider
                   min={0}
@@ -82,11 +84,12 @@ const Tu = ({ tu, isLoading, save, task }) => {
         array.push({ id: element.id, value: element.value });
       });
       setTuvs(array);
+      // document.addEventListener("keydown", keydownHandler);
     }
   }, []);
 
-  const saveAll = () => {
-    save(tuvs);
+  const saveAll = _tuvs => {
+    save(_tuvs);
   };
 
   const saveValue = (id, value) => {
@@ -96,15 +99,22 @@ const Tu = ({ tu, isLoading, save, task }) => {
     setTuvs(tuvs);
   };
 
+  const keydownHandler = e => {
+    if (e.keyCode === 13 && e.ctrlKey) {
+      saveAll(tuvs);
+    }
+  };
+
   return (
     <Row className="mt-5">
+      <EventListener target={document} onKeyDown={keydownHandler} />
       {data && (
         <Col>
           <Row>
             <Col xs={24}>
-              <Title level={4}>Source ({data.sourceLang})</Title>
+              <Text strong>Source ({data.sourceLang})</Text>
               <Paragraph
-                className="p-3 mr-2"
+                className="p-1 mr-2"
                 style={{
                   backgroundColor: "#f0f2f5"
                 }}
@@ -113,9 +123,9 @@ const Tu = ({ tu, isLoading, save, task }) => {
               </Paragraph>
             </Col>
             <Col xs={24}>
-              <Title level={4}>Reference ({data.referenceLang})</Title>
+              <Text strong>Reference ({data.referenceLang})</Text>
               <Paragraph
-                className="p-3 mr-2"
+                className="p-1 mr-2"
                 style={{
                   backgroundColor: "#f0f2f5"
                 }}
@@ -137,8 +147,10 @@ const Tu = ({ tu, isLoading, save, task }) => {
                 );
               })}
               <Button
-                onClick={saveAll}
-                className="right mt-5"
+                onClick={() => {
+                  saveAll(tuvs);
+                }}
+                className="right mt-3"
                 type="primary"
                 icon="save"
               >

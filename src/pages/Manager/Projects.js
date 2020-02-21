@@ -6,6 +6,7 @@ import { HOST_API } from "./../../config";
 
 import ProjectsList from "./../../components/ProjectsList";
 import ProjectForm from "./../../components/ProjectForm";
+import ProjectCloneForm from "./../../components/ProjectForm/ProjectCloneForm";
 import TuvsManager from "./../../components/TuvsManager";
 import Tasks from "./../../components/Tasks";
 import { AppContext } from "./../../AppContext";
@@ -77,6 +78,23 @@ const Projects = () => {
       setLoading(false);
     }
   };
+  const clone = async (values, form) => {
+    try {
+      setLoading(true);
+      await axios({
+        method: "post",
+        url: `${HOST_API}/v1/projects/${project.id}`,
+        data: values
+      });
+      fetch(true);
+      setVisible(false);
+      form.resetFields();
+      message.success("Successful Action!");
+    } catch (error) {
+      message.error(error.message);
+      setLoading(false);
+    }
+  };
 
   const save = async (values, form) => {
     try {
@@ -100,8 +118,9 @@ const Projects = () => {
     try {
       setLoading(true);
       await axios.delete(`${HOST_API}/v1/projects/${value.id}`);
-      setVisible(false);
       fetch(true);
+      setVisible(false);
+      
       message.success("Successful Action!");
     } catch (error) {
       message.error(error.message);
@@ -116,6 +135,12 @@ const Projects = () => {
 
   const selectProject = value => {
     setMode("edit");
+    setProject(value);
+    setVisible(true);
+  };
+
+  const selectClone = value => {
+    setMode("clone");
     setProject(value);
     setVisible(true);
   };
@@ -140,6 +165,8 @@ const Projects = () => {
         return "Edit Project";
       case "pass":
         return "Update Password";
+      case "clone":
+        return "Clone Project";
 
       default:
         break;
@@ -208,14 +235,15 @@ const Projects = () => {
                     projects={projects}
                     loading={loading}
                     select={selectProject}
+                    selectClone={selectClone}
                     remove={remove}
                     showsTuvs={showsTuvs}
                     showsTasks={showsTasks}
                   />
                 </TabPane>
-                {mode === "tuvs" && project && project.Tuvs.length && (
+                {mode === "tuvs" && project && project.projects.length && (
                   <TabPane tab={`Tuvs (${project.name})`} key="tuvs">
-                    <TuvsManager tuvs={project.Tuvs} />
+                    <TuvsManager tuvs={project.projects} />
                   </TabPane>
                 )}
                 {mode === "tasks" && project && (
@@ -235,12 +263,18 @@ const Projects = () => {
         onCancel={handleCancel}
         footer={false}
       >
-        <ProjectForm
-          loading={loading}
-          add={add}
-          save={save}
-          project={project}
-        />
+        {mode !== "clone" && (
+          <ProjectForm
+            loading={loading}
+            add={add}
+            save={save}
+            project={project}
+          />
+        )}
+
+        {mode === "clone" && (
+          <ProjectCloneForm loading={loading} clone={clone} />
+        )}
       </Modal>
     </div>
   );

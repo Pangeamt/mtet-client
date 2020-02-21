@@ -10,7 +10,7 @@ const checkFile = (file, allowedFiles) => {
   return true;
 };
 
-const ProjectFormCmp = ({ form, loading, add, save, project }) => {
+const ProjectFormCmp = ({ form, loading, add, save, project, mode }) => {
   const [fileList, setFileList] = useState([]);
 
   const handleSubmit = e => {

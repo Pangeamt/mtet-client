@@ -1,6 +1,16 @@
 import React from "react";
-import { Table, Button, Popconfirm, Icon, Tooltip, Typography } from "antd";
-
+import {
+  Table,
+  Button,
+  Popconfirm,
+  Icon,
+  Tooltip,
+  Typography,
+  Progress,
+  Dropdown,
+  Menu
+} from "antd";
+import numeral from "numeral";
 import styled from "styled-components";
 
 import TASKS from "./../../assets/tasks.png";
@@ -17,6 +27,7 @@ const ProjectsList = ({
   projects,
   remove,
   select,
+  selectClone,
   showsTuvs,
   showsTasks
 }) => {
@@ -53,68 +64,31 @@ const ProjectsList = ({
       key: "tuvs"
     },
     {
-      title: "Type",
-      dataIndex: "type",
-      key: "type"
+      title: "Complete %",
+      key: "complete",
+      render: (text, record) => {
+        return (
+          <Progress
+            percent={numeral((record.complete * 100) / record.total).format(
+              "0.00"
+            )}
+          />
+        );
+      }
     },
-    // {
-    //   title: "Task",
-    //   key: "task",
-    //   render: (text, record) => {
-    //     return (
-    //       <React.Fragment>
-    //         <ButtonActions
-    //           onClick={() => {
-    //             showsTasks(record);
-    //           }}
-    //           type="primary"
-    //           size="small"
-    //         >
-    //           Tasks
-    //         </ButtonActions>
-    //       </React.Fragment>
-    //     );
-    //   }
-    // },
-    // {
-    //   title: "Tuvs",
-    //   key: "tuvs",
-    //   render: (text, record) => {
-    //     return (
-    //       <React.Fragment>
-    //         {record.Tuvs && record.Tuvs.length > 0 && (
-    //           <ButtonActions
-    //             onClick={() => {
-    //               showsTuvs(record);
-    //             }}
-    //             type="primary"
-    //             size="small"
-    //           >
-    //             Tuvs
-    //           </ButtonActions>
-    //         )}
-    //         {record.Tuvs && record.Tuvs.length === 0 && (
-    //           <ButtonActions icon="loading" size="small">
-    //             Loading...
-    //           </ButtonActions>
-    //         )}
-    //       </React.Fragment>
-    //     );
-    //   }
-    // },
+
     {
       title: "",
       key: "action",
       fixed: "right",
-      render: (text, record) => (
-        <React.Fragment>
-          <Tooltip placement="top" title="Tasks">
-            <ButtonActions
+      render: (text, record) => {
+        const menu = (
+          <Menu>
+            <Menu.Item
               onClick={() => {
                 showsTasks(record);
               }}
-              shape="circle"
-              size="small"
+              key="1"
             >
               <img
                 style={{
@@ -124,18 +98,16 @@ const ProjectsList = ({
                 }}
                 src={TASKS}
                 alt=""
+                className="mr-2"
               />
-            </ButtonActions>
-          </Tooltip>
-
-          {record.Tuvs && record.Tuvs.length > 0 && (
-            <Tooltip placement="top" title="Tuvs">
-              <ButtonActions
+              Tasks
+            </Menu.Item>
+            {record.projects && record.projects.length > 0 && (
+              <Menu.Item
+                key="2"
                 onClick={() => {
                   showsTuvs(record);
                 }}
-                shape="circle"
-                size="small"
               >
                 <img
                   style={{
@@ -145,52 +117,63 @@ const ProjectsList = ({
                   }}
                   src={TUVS}
                   alt=""
+                  className="mr-2"
                 />
-              </ButtonActions>
-            </Tooltip>
-          )}
+                Tuvs
+              </Menu.Item>
+            )}
 
-          {record.Tuvs && record.Tuvs.length === 0 && (
-            <Tooltip placement="top" title="Tuvs">
-              <ButtonActions
-                shape="circle"
-                icon="loading"
-                size="small"
-              ></ButtonActions>
-            </Tooltip>
-          )}
+            {record.projects && record.projects.length === 0 && (
+              <Menu.Item key="3">
+                <Icon type="loading" />
+                loading...
+              </Menu.Item>
+            )}
 
-          <Tooltip placement="top" title="Edit">
-            <ButtonActions
+            <Menu.Item
+              key="4"
               onClick={() => {
                 select(record);
               }}
               disabled={record.Tasks && record.Tasks.length > 0}
-              type="primary"
-              shape="circle"
-              icon="edit"
-              size="small"
-            />
-          </Tooltip>
-
-          <Tooltip placement="top" title="Delete">
-            <Popconfirm
-              title="Are you sure？"
-              onConfirm={() => {
-                remove(record);
-              }}
-              icon={<Icon type="question-circle-o" style={{ color: "red" }} />}
             >
-              <ButtonActions
-                type="danger"
-                shape="circle"
-                icon="delete"
-                size="small"
-              />
-            </Popconfirm>
-          </Tooltip>
-        </React.Fragment>
-      )
+              <Icon type="edit" />
+              Edit
+            </Menu.Item>
+            <Menu.Item
+              key="4"
+              onClick={() => {
+                selectClone(record);
+              }}
+            >
+              <Icon type="copy" />
+              Clone
+            </Menu.Item>
+          </Menu>
+        );
+        return (
+          <React.Fragment>
+            <Dropdown overlay={menu}>
+              <Button size="small" className="mr-2">
+                Actions <Icon type="down" />
+              </Button>
+            </Dropdown>
+            <Tooltip placement="top" title="Delete">
+              <Popconfirm
+                title="Are you sure？"
+                onConfirm={() => {
+                  remove(record);
+                }}
+                icon={
+                  <Icon type="question-circle-o" style={{ color: "red" }} />
+                }
+              >
+                <ButtonActions type="danger" icon="delete" size="small" />
+              </Popconfirm>
+            </Tooltip>
+          </React.Fragment>
+        );
+      }
     }
   ];
 

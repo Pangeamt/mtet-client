@@ -1,12 +1,13 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useContext } from "react";
-import { Layout, Dropdown, Icon, Avatar, Button } from "antd";
+import { Layout, Dropdown, Icon, Avatar, Row, Col } from "antd";
 import styled from "styled-components";
 import { reactLocalStorage } from "reactjs-localstorage";
-import { navigate } from "@reach/router";
+import { navigate, Link } from "@reach/router";
 
 import "./style.css";
 import avatarDropdown from "./avatarDropdown";
+import LOGO from "./../../assets/NTEU_MTET.jpg";
 import { AppContext } from "./../../AppContext";
 
 const HeaderRight = styled.div`
@@ -35,38 +36,50 @@ const Section = props => {
             user.role !== "admin" ? "container " : "header-by-role w-100"
           }
         >
-          <div className="header-left">
-            {user.role === "admin" && (
-              <div
-                onClick={() => {
-                  props.onCollapse(!props.collapsed);
-                }}
-                className="list-unstyled list-inline"
-              >
-                <a href="#" className="list-inline-item">
-                  {" "}
-                  <Icon
-                    type={props.collapsed ? "menu-unfold" : "menu-fold"}
-                    className="list-icon"
-                  />{" "}
-                </a>
+          <Row>
+            <Col xs={12}>
+              {user.role === "admin" && (
+                <div
+                  onClick={() => {
+                    props.onCollapse(!props.collapsed);
+                  }}
+                  className="list-unstyled list-inline"
+                >
+                  <a href="#" className="list-inline-item">
+                    {" "}
+                    <Icon
+                      type={props.collapsed ? "menu-unfold" : "menu-fold"}
+                      className="list-icon"
+                    />{" "}
+                  </a>
+                </div>
+              )}
+              <Link to="/">
+                <img
+                  src={LOGO}
+                  alt=""
+                  style={{
+                    height: 50,
+                    marginLeft: 10
+                  }}
+                />
+              </Link>
+            </Col>
+            <Col xs={12}>
+              <div className="right list-unstyled list-inline">
+                <Dropdown
+                  className="list-inline-item"
+                  overlay={avatarDropdown({ user, logout })}
+                  trigger={["click"]}
+                  placement="bottomRight"
+                >
+                  <a className="ant-dropdown-link no-link-style" href="#">
+                    <Avatar icon="user" size="small" />
+                  </a>
+                </Dropdown>
               </div>
-            )}
-          </div>
-          <HeaderRight className="header-right">
-            <div className="list-unstyled list-inline">
-              <Dropdown
-                className="list-inline-item"
-                overlay={avatarDropdown({ user, logout })}
-                trigger={["click"]}
-                placement="bottomRight"
-              >
-                <a className="ant-dropdown-link no-link-style" href="#">
-                  <Avatar icon="user" size="small" />
-                </a>
-              </Dropdown>
-            </div>
-          </HeaderRight>
+            </Col>
+          </Row>
         </div>
       </div>
     </Header>
