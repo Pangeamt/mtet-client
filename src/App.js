@@ -3,6 +3,7 @@ import { reactLocalStorage } from "reactjs-localstorage";
 import { Router } from "@reach/router";
 
 import Login from "./pages/Login";
+import Logout from "./pages/Logout";
 
 import { NotFound } from "./pages/NotFound";
 import { Forbidden } from "./pages/Forbidden";
@@ -37,6 +38,7 @@ export const App = () => {
       <React.Fragment>
         <Router>
           <Login path="/" />
+          <Logout path="/logout" />
           <Forbidden path="403" />
           <NotFound default />
           <Admin path="admin">

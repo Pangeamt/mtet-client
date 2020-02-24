@@ -89,7 +89,7 @@ const Dashboard = () => {
       title: "Complete",
       key: "complete",
       render: (text, record) => {
-        return <span>{record.complete}</span>;
+        return <span>{record.completes}</span>;
       }
     },
     {
@@ -98,7 +98,7 @@ const Dashboard = () => {
       render: (text, record) => {
         return (
           <Progress
-            percent={numeral((record.complete * 100) / record.total).format(
+            percent={numeral((record.completes * 100) / record.total).format(
               "0.00"
             )}
           />
@@ -112,7 +112,7 @@ const Dashboard = () => {
       render: (text, record) => {
         return (
           <React.Fragment>
-            {record.complete === record.total && (
+            {record.completes === record.total && (
               <Button
                 className="right ml-2"
                 onClick={() => {
@@ -134,7 +134,7 @@ const Dashboard = () => {
               type="primary"
               size="small"
             >
-              {record.complete > 0 ? "Continue" : "Start"}
+              {record.completes > 0 ? "Continue" : "Start"}
             </Button>
           </React.Fragment>
         );

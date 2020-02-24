@@ -149,6 +149,7 @@ const Users = () => {
       </Card>
 
       <Modal
+      maskClosable={false}
         title={getTitle()}
         visible={visible}
         onCancel={handleCancel}

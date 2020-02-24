@@ -9,13 +9,23 @@ import ProjectForm from "./../../components/ProjectForm";
 import ProjectCloneForm from "./../../components/ProjectForm/ProjectCloneForm";
 import TuvsManager from "./../../components/TuvsManager";
 import Tasks from "./../../components/Tasks";
+
+import {
+  handleError,
+  getProjects,
+  addProject,
+  cloneProject,
+  saveProject,
+  removeProject
+} from "./../../services";
+
 import { AppContext } from "./../../AppContext";
 import IMAGE from "./../../assets/pm.png";
 
 const { TabPane } = Tabs;
 
 const Projects = () => {
-  const { user, token } = useContext(AppContext);
+  const { user } = useContext(AppContext);
 
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -26,24 +36,17 @@ const Projects = () => {
 
   useEffect(() => {
     fetch(true);
-    const fetchInterval = setInterval(() => {
-      fetch();
-    }, 5000);
-
-    return function cleanup() {
-      clearInterval(fetchInterval);
-    };
   }, []);
 
   const fetch = async (load = false) => {
     try {
       if (load) setLoading(true);
-      const { data } = await axios.get(`${HOST_API}/v1/projects`);
-
+      const { data } = await getProjects();
       setProjects(data);
       setLoading(false);
+      setVisible(false);
     } catch (error) {
-      message.error(error.message);
+      handleError(error);
       setLoading(false);
     }
   };
@@ -59,39 +62,26 @@ const Projects = () => {
       values.files.forEach(file => {
         formData.append("files[]", file.originFileObj);
       });
-      const { data } = await axios.post(`${HOST_API}/v1/projects`, formData, {
-        headers: {
-          "content-type": "multipart/form-data"
-        }
-      });
-      console.log(data);
-      message.success("Successful Action!");
+      await addProject(formData);
       form.resetFields();
       fetch(true);
-      setVisible(false);
+      message.success("Successful Action!");
     } catch (error) {
-      if (error.response.data.message) {
-        message.error(error.response.data.message);
-      } else {
-        message.error(error.message);
-      }
+      handleError(error);
       setLoading(false);
     }
   };
+
   const clone = async (values, form) => {
     try {
       setLoading(true);
-      await axios({
-        method: "post",
-        url: `${HOST_API}/v1/projects/${project.id}`,
-        data: values
-      });
+      await cloneProject(project.id, values);
       fetch(true);
       setVisible(false);
       form.resetFields();
       message.success("Successful Action!");
     } catch (error) {
-      message.error(error.message);
+      handleError(error);
       setLoading(false);
     }
   };
@@ -99,17 +89,13 @@ const Projects = () => {
   const save = async (values, form) => {
     try {
       setLoading(true);
-      await axios({
-        method: "patch",
-        url: `${HOST_API}/v1/projects/${project.id}`,
-        data: values
-      });
+      await saveProject(project.id, values);
       fetch(true);
       setVisible(false);
       form.resetFields();
       message.success("Successful Action!");
     } catch (error) {
-      message.error(error.message);
+      handleError(error);
       setLoading(false);
     }
   };
@@ -117,13 +103,12 @@ const Projects = () => {
   const remove = async value => {
     try {
       setLoading(true);
-      await axios.delete(`${HOST_API}/v1/projects/${value.id}`);
+      await removeProject(value.id);
       fetch(true);
       setVisible(false);
-      
       message.success("Successful Action!");
     } catch (error) {
-      message.error(error.message);
+      handleError();
       setLoading(false);
     }
   };
@@ -257,6 +242,7 @@ const Projects = () => {
         </Row>
       </article>
       <Modal
+        maskClosable={false}
         width={800}
         title={getTitle()}
         visible={visible}

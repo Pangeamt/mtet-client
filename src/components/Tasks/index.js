@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Row,
   Col,
@@ -14,18 +14,25 @@ import {
   Tooltip,
   Popconfirm
 } from "antd";
-import axios from "axios";
-import { HOST_API } from "./../../config";
-import { AppContext } from "./../../AppContext";
-import TaskForm from "./../TaskForm";
 import numeral from "numeral";
+
+import TaskForm from "./../TaskForm";
+import {
+  handleError,
+  getEvaluators,
+  getTasks,
+  removeTask,
+  addTask,
+  assignTask,
+  restartTask,
+  activeTask
+} from "./../../services";
 
 import "./style.css";
 
 const { Title, Text } = Typography;
 
 const Tasks = ({ project }) => {
-  const { token } = useContext(AppContext);
   const tuvs = project.projects || [];
 
   const [visible, setVisible] = useState(false);
@@ -55,44 +62,34 @@ const Tasks = ({ project }) => {
 
   const fetchEvaluators = async () => {
     try {
-      const { data } = await axios.get(`${HOST_API}/v1/users/evaluators`);
+      const { data } = await getEvaluators();
       setEvaluators(data);
     } catch (error) {
-      message.error(error.message);
+      handleError(error);
     }
   };
 
   const fetch = async () => {
     try {
       setLoading(true);
-      axios.defaults.headers.common["x-access-token"] = token;
-      const { data } = await axios.get(`${HOST_API}/v1/tasks`, {
-        params: {
-          project: project.id
-        }
-      });
+      const { data } = await getTasks(project.id);
       setTasks(data);
       setLoadingActive(false);
       setLoading(false);
     } catch (error) {
-      message.error(error.message);
+      handleError(error);
       setLoading(true);
     }
   };
 
-  const remove = async (record, value) => {
+  const remove = async record => {
     try {
       setLoadingActive(`load-${record.id}`);
-      axios.defaults.headers.common["x-access-token"] = token;
-      await axios({
-        method: "delete",
-        url: `${HOST_API}/v1/tasks/${record.id}`
-      });
+      await removeTask(record.id);
       fetch();
-
       message.success("Successful Action!");
     } catch (error) {
-      message.error(error.message);
+      handleError(error);
       setLoadingActive(false);
     }
   };
@@ -180,20 +177,13 @@ const Tasks = ({ project }) => {
   const create = async () => {
     try {
       setLoading(true);
-      axios.defaults.headers.common["x-access-token"] = token;
-      await axios({
-        method: "post",
-        url: `${HOST_API}/v1/tasks`,
-        data: { tasks: collectionsTasks, project: project.id }
-      });
-
+      await addTask(collectionsTasks, project.id);
       setCollectionsTasks([]);
       setVisibleForm(false);
       fetch();
-
       message.success("Successful Action!");
     } catch (error) {
-      message.error(error.message);
+      handleError(error);
       setLoading(false);
     }
   };
@@ -201,19 +191,13 @@ const Tasks = ({ project }) => {
   const assign = async evaluator => {
     try {
       setLoadingActive(`assign-${evaluator}`);
-      axios.defaults.headers.common["x-access-token"] = token;
-      await axios({
-        method: "post",
-        url: `${HOST_API}/v1/tasks/${selectedTask.id}`,
-        data: { evaluator }
-      });
-
+      await assignTask(evaluator, selectedTask.id);
       fetch();
-      setLoadingActive(false);
       handleCancel();
+      setLoadingActive(false);
       message.success("Successful Action!");
     } catch (error) {
-      message.error(error.message);
+      handleError(error);
       setLoadingActive(false);
     }
   };
@@ -221,18 +205,13 @@ const Tasks = ({ project }) => {
   const restart = async task => {
     try {
       setLoadingActive(`restart-${task}`);
-      axios.defaults.headers.common["x-access-token"] = token;
-      await axios({
-        method: "put",
-        url: `${HOST_API}/v1/tasks/${task}`
-      });
-
+      await restartTask(task);
       fetch();
       setLoadingActive(false);
       handleCancel();
       message.success("Successful Action!");
     } catch (error) {
-      message.error(error.message);
+      handleError(error);
       setLoadingActive(false);
     }
   };
@@ -240,18 +219,13 @@ const Tasks = ({ project }) => {
   const active = async task => {
     try {
       setLoadingActive(`active-${task}`);
-      axios.defaults.headers.common["x-access-token"] = token;
-      await axios({
-        method: "patch",
-        url: `${HOST_API}/v1/tasks/${task}`
-      });
-
+      await activeTask(task);
       fetch();
       setLoadingActive(false);
       handleCancel();
       message.success("Successful Action!");
     } catch (error) {
-      message.error(error.message);
+      handleError(error);
       setLoadingActive(false);
     }
   };
@@ -366,7 +340,7 @@ const Tasks = ({ project }) => {
             {!record.active && (
               <Popconfirm
                 onConfirm={() => {
-                  remove(record, false);
+                  remove(record);
                 }}
                 title="Are you sure？"
                 okText="Yes"
@@ -471,6 +445,7 @@ const Tasks = ({ project }) => {
       </Col>
 
       <Modal
+        maskClosable={false}
         title="Evaluators"
         visible={visible}
         onCancel={handleCancel}
@@ -484,6 +459,7 @@ const Tasks = ({ project }) => {
         />
       </Modal>
       <Modal
+        maskClosable={false}
         footer={false}
         title="Create Tasks"
         visible={visibleForm}

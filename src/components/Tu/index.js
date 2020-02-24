@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   Row,
   Col,
@@ -9,11 +9,12 @@ import {
   Button
 } from "antd";
 
-import EventListener, { withOptions } from "react-event-listener";
+import EventListener from "react-event-listener";
+import { AppContext } from "./../../AppContext";
 
 const { Text, Paragraph } = Typography;
 
-const Tuv = ({ item, saveValue }) => {
+const Tuv = ({ item, saveValue, user }) => {
   const [tuv, setTuv] = useState(null);
   const [value, setValue] = useState(0);
 
@@ -21,6 +22,8 @@ const Tuv = ({ item, saveValue }) => {
     if (item) {
       setTuv(item);
       setValue(item.value);
+      console.log(item);
+      console.log(user);
     }
   }, []);
 
@@ -47,6 +50,7 @@ const Tuv = ({ item, saveValue }) => {
             <Row className="p-1">
               <Col span={12}>
                 <Slider
+                  disabled={user.id !== item.UserId}
                   min={0}
                   max={100}
                   onChange={onChange}
@@ -57,6 +61,7 @@ const Tuv = ({ item, saveValue }) => {
               </Col>
               <Col span={4}>
                 <InputNumber
+                  disabled={user.id !== item.UserId}
                   min={0}
                   max={100}
                   style={{ marginLeft: 16 }}
@@ -73,6 +78,8 @@ const Tuv = ({ item, saveValue }) => {
 };
 
 const Tu = ({ tu, isLoading, save, task }) => {
+  const { user } = useContext(AppContext);
+
   const [data, setData] = useState(null);
   const [tuvs, setTuvs] = useState([]);
 
@@ -141,6 +148,7 @@ const Tu = ({ tu, isLoading, save, task }) => {
                 return (
                   <Tuv
                     item={item}
+                    user={user}
                     isLoading={isLoading}
                     saveValue={saveValue}
                   />
