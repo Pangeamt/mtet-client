@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "@reach/router";
 import {
   Card,
@@ -12,14 +12,12 @@ import {
   Col
 } from "antd";
 import { navigate } from "@reach/router";
-import axios from "axios";
 import styled from "styled-components";
 
 import Tu from "./../../components/Tu";
-import { AppContext } from "./../../AppContext";
-import { HOST_API } from "./../../config";
+import { handleError, saveTask, getEvaluatorsTasks } from "./../../services";
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 const TextLink = styled(Text)`
   cursor: pointer;
@@ -32,8 +30,6 @@ const TextLink = styled(Text)`
 `;
 
 const Tasks = ({ id }) => {
-  const { token } = useContext(AppContext);
-
   const [current, setCurrent] = useState(1);
   const [loading, setLoading] = useState(true);
   const [tuvs, setTuvs] = useState([]);
@@ -42,15 +38,15 @@ const Tasks = ({ id }) => {
 
   useEffect(() => {
     fetch();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetch = async (restart = true) => {
     try {
       setLoading(true);
-      axios.defaults.headers.common["x-access-token"] = token;
       const {
         data: { docs, task }
-      } = await axios.get(`${HOST_API}/v1/tasks/${id}`);
+      } = await getEvaluatorsTasks(id);
 
       setTuvs(docs);
       setTask(task);
@@ -71,39 +67,24 @@ const Tasks = ({ id }) => {
         setTu(docs[stop]);
         setCurrent(stop + 1);
       }
-
       setLoading(false);
     } catch (error) {
+      handleError(error);
       setLoading(false);
-      message.error(error.message);
-      if (error.message === "Request failed with status code 401") {
-        navigate(`/evaluator`);
-      }
     }
   };
 
   const save = async values => {
     message.loading("Action in progress..", 0);
     try {
-      // Dismiss manually and asynchronously
-
-      axios.defaults.headers.common["x-access-token"] = token;
-      await axios({
-        method: "post",
-        url: `${HOST_API}/v1/tasks/evaluation/save`,
-        data: { values, task: task.id }
-      });
-
+      await saveTask(values, task.id);
       fetch(false);
       message.destroy();
       nextPage();
       message.success("Successful Action!");
     } catch (error) {
       message.destroy();
-      message.error(error.message);
-      if (error.message === "Request failed with status code 401") {
-        navigate(`/evaluator`);
-      }
+      handleError(error);
     }
   };
 

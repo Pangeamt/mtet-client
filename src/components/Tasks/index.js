@@ -58,6 +58,7 @@ const Tasks = ({ project }) => {
       }
     });
     setTus(obj);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchEvaluators = async () => {
@@ -113,7 +114,7 @@ const Tasks = ({ project }) => {
     const nTus = Object.keys(tus).length;
     const txe = parseInt(nTus / numberTasks) + 1;
     const copyTus = [];
-    Object.keys(tus).map(item => {
+    Object.keys(tus).forEach(item => {
       copyTus.push(tus[item]);
     });
 
@@ -150,7 +151,7 @@ const Tasks = ({ project }) => {
             });
           }
         }
-        aux.map(item => {
+        aux.forEach(item => {
           newTasks[i].tus.push(item);
           newTasks[i].tuvs += item.length;
         });

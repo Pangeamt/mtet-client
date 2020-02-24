@@ -9,18 +9,22 @@ import {
   Typography,
   Card
 } from "antd";
-import axios from "axios";
 import numeral from "numeral";
 import { navigate } from "@reach/router";
 
-import { HOST_API } from "./../../config";
 import { AppContext } from "./../../AppContext";
 import IMAGE from "./undraw_body_text_l3ld.png";
+
+import {
+  handleError,
+  getEvaluatorsTasksV1,
+  finishTask
+} from "./../../services";
 
 const { Title } = Typography;
 
 const Dashboard = () => {
-  const { user, token } = useContext(AppContext);
+  const { user } = useContext(AppContext);
 
   const [loading, setLoading] = useState(false);
   const [tasks, setTasks] = useState([]);
@@ -32,12 +36,11 @@ const Dashboard = () => {
   const fetch = async () => {
     try {
       setLoading(true);
-      axios.defaults.headers.common["x-access-token"] = token;
-      const { data } = await axios.get(`${HOST_API}/v1/tasks/evaluator`);
+      const { data } = await getEvaluatorsTasksV1();
       setTasks(data);
       setLoading(false);
     } catch (error) {
-      message.error(error.message);
+      handleError(error);
       setLoading(false);
     }
   };
@@ -49,18 +52,11 @@ const Dashboard = () => {
   const finish = async task => {
     try {
       setLoading(true);
-      axios.defaults.headers.common["x-access-token"] = token;
-      await axios({
-        method: "patch",
-        url: `${HOST_API}/v1/tasks/${task.id}`,
-        data: { finish: true }
-      });
-
+      await finishTask(task.id);
       fetch();
-
       message.success("Successful Action!");
     } catch (error) {
-      message.error(error.message);
+      handleError(error);
       setLoading(false);
     }
   };

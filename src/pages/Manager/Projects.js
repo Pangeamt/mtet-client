@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Row, Col, Tabs, Button, Modal, message, Card } from "antd";
-import axios from "axios";
-
-import { HOST_API } from "./../../config";
 
 import ProjectsList from "./../../components/ProjectsList";
 import ProjectForm from "./../../components/ProjectForm";

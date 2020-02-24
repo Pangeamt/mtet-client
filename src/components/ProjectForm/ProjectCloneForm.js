@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Form, Input, Upload, Icon, Button, Select, message } from "antd";
+import React from "react";
+import { Form, Input, Button } from "antd";
 
 const ProjectCloneFormCmp = ({ form, loading, clone }) => {
   const handleSubmit = e => {

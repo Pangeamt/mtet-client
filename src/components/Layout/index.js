@@ -6,7 +6,6 @@ import styled from "styled-components";
 import { AppContext } from "./../../AppContext";
 import Header from "./../Header";
 import AdminMenu from "./../Menus/AdminMenu";
-import ManagerMenu from "./../Menus/ManagerMenu";
 
 const { Content, Footer, Sider } = Layout;
 

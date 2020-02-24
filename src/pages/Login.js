@@ -1,13 +1,12 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Card, message } from "antd";
+import { Card } from "antd";
 import styled from "styled-components";
-import axios from "axios";
 import { navigate } from "@reach/router";
 import { reactLocalStorage } from "reactjs-localstorage";
 
 import { AppContext } from "./../AppContext";
-import { HOST_API } from "./../config/";
 import LoginForm from "./../components/LoginForm";
+import { handleError, login } from "./../services";
 
 const CardLogin = styled(Card)`
   width: 100%;
@@ -35,16 +34,14 @@ const Login = () => {
       return navigate(`/evaluator`);
     }
   };
-  const login = async form => {
+
+  const _login = async form => {
     try {
       setLoading(true);
       const {
         data: { token, user }
-      } = await axios({
-        method: "post",
-        url: `${HOST_API}/v1/auth/login`,
-        data: form
-      });
+      } = await login(form);
+
       if (token && user) {
         reactLocalStorage.set("token", token);
         reactLocalStorage.setObject("user", user);
@@ -54,7 +51,7 @@ const Login = () => {
         redirect(user);
       }
     } catch (error) {
-      message.error(error.message);
+      handleError(error);
       setLoading(false);
     }
   };
@@ -64,7 +61,7 @@ const Login = () => {
       <div className="row justify-content-center align-items-center">
         <div className="col-12 col-sm-10 col-md-8 col-lg-5">
           <CardLogin>
-            <LoginForm loading={loading} login={login} />
+            <LoginForm loading={loading} login={_login} />
           </CardLogin>
         </div>
       </div>

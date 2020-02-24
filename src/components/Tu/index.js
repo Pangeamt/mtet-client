@@ -25,6 +25,7 @@ const Tuv = ({ item, saveValue, user }) => {
       console.log(item);
       console.log(user);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onChange = value => {
@@ -91,8 +92,8 @@ const Tu = ({ tu, isLoading, save, task }) => {
         array.push({ id: element.id, value: element.value });
       });
       setTuvs(array);
-      // document.addEventListener("keydown", keydownHandler);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const saveAll = _tuvs => {

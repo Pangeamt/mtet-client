@@ -5,7 +5,6 @@ import {
   Popconfirm,
   Icon,
   Tooltip,
-  Typography,
   Progress,
   Dropdown,
   Menu
@@ -15,8 +14,6 @@ import styled from "styled-components";
 
 import TASKS from "./../../assets/tasks.png";
 import TUVS from "./../../assets/tuvs.png";
-
-const { Text } = Typography;
 
 const ButtonActions = styled(Button)`
   margin-right: 10px;
@@ -36,6 +33,7 @@ const ProjectsList = ({
       title: "Name",
       dataIndex: "name",
       key: "name",
+      // eslint-disable-next-line jsx-a11y/anchor-is-valid
       render: text => <a>{text}</a>
     },
     {

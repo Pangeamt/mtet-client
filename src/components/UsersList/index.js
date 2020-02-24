@@ -13,6 +13,7 @@ const UsersList = ({ loading, users, remove, select, showPassForm }) => {
       title: "Nickname",
       dataIndex: "nickname",
       key: "nickname",
+      // eslint-disable-next-line jsx-a11y/anchor-is-valid
       render: text => <a>{text}</a>
     },
     {

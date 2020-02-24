@@ -9,6 +9,7 @@ const Logout = () => {
 
   useEffect(() => {
     run();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const run = () => {

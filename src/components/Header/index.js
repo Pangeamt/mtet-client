@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useContext } from "react";
 import { Layout, Dropdown, Icon, Avatar, Row, Col } from "antd";
-import styled from "styled-components";
 import { reactLocalStorage } from "reactjs-localstorage";
 import { navigate, Link } from "@reach/router";
 
@@ -9,12 +8,6 @@ import "./style.css";
 import avatarDropdown from "./avatarDropdown";
 import LOGO from "./../../assets/NTEU_MTET.jpg";
 import { AppContext } from "./../../AppContext";
-
-const HeaderRight = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-`;
 
 const { Header } = Layout;
 

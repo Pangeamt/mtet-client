@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Tabs, Button, Modal, message, Card } from "antd";
-import axios from "axios";
 
-import { HOST_API } from "./../../config";
 import UsersList from "./../../components/UsersList";
 import UserForm from "./../../components/UserForm";
 import UserEditForm from "../../components/UserForm/UserEditForm";
 import PasswordForm from "../../components/UserForm/PasswordForm";
+
+import {
+  handleError,
+  getUsers,
+  addUser,
+  saveUser,
+  removeUser
+} from "./../../services";
 
 const { TabPane } = Tabs;
 
@@ -31,12 +37,11 @@ const Users = () => {
   const fetch = async (load = false) => {
     try {
       if (load) setLoading(true);
-      const { data } = await axios.get(`${HOST_API}/v1/users`);
-
+      const { data } = await getUsers();
       setUsers(data);
       setLoading(false);
     } catch (error) {
-      message.error(error.message);
+      handleError(error);
       setLoading(false);
     }
   };
@@ -44,16 +49,12 @@ const Users = () => {
   const add = async values => {
     try {
       setLoading(true);
-      await axios({
-        method: "post",
-        url: `${HOST_API}/v1/users`,
-        data: values
-      });
+      await addUser(values);
       setVisible(false);
       fetch(true);
       message.success("Successful Action!");
     } catch (error) {
-      message.error(error.message);
+      handleError(error);
       setLoading(false);
     }
   };
@@ -61,11 +62,7 @@ const Users = () => {
   const save = async values => {
     try {
       setLoading(true);
-      await axios({
-        method: "patch",
-        url: `${HOST_API}/v1/users/${user.id}`,
-        data: values
-      });
+      await saveUser(values, user.id);
       setVisible(false);
       fetch(true);
       message.success("Successful Action!");
@@ -78,7 +75,7 @@ const Users = () => {
   const remove = async value => {
     try {
       setLoading(true);
-      await axios.delete(`${HOST_API}/v1/users/${value.id}`);
+      await removeUser(value.id);
       setVisible(false);
       fetch(true);
       message.success("Successful Action!");
@@ -149,7 +146,7 @@ const Users = () => {
       </Card>
 
       <Modal
-      maskClosable={false}
+        maskClosable={false}
         title={getTitle()}
         visible={visible}
         onCancel={handleCancel}
