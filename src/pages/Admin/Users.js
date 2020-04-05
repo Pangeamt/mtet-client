@@ -86,7 +86,6 @@ const Users = () => {
   };
 
   const handleCancel = e => {
-    console.log(e);
     setVisible(false);
   };
 

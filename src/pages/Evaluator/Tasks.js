@@ -38,7 +38,7 @@ const Tasks = ({ id }) => {
 
   useEffect(() => {
     fetch();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetch = async (restart = true) => {
@@ -50,7 +50,6 @@ const Tasks = ({ id }) => {
 
       setTuvs(docs);
       setTask(task);
-
       if (docs.length && restart) {
         let stop = 0;
         for (let i = 0; i < docs.length; i++) {
@@ -104,6 +103,30 @@ const Tasks = ({ id }) => {
     }
   };
 
+  const getSegments = tu => {
+    const segments = {
+      next: [],
+      prev: []
+    };
+    for (let i = 0; i < tuvs.length; i++) {
+      if (tu.tuId === tuvs[i].tuId) {
+        for (let j = 1; j <= task.project.segments; j++) {
+          if (tuvs[i + j]) {
+            segments.next.push(tuvs[i + j]);
+          }
+        }
+        for (let j = 1; j <= task.project.segments; j++) {
+          if (tuvs[i - j]) {
+            segments.prev.push(tuvs[i - j]);
+          }
+        }
+        break;
+      }
+    }
+    console.log(segments);
+    return segments;
+  };
+
   return (
     <div className="container mt-5">
       <Card>
@@ -130,7 +153,13 @@ const Tasks = ({ id }) => {
         <Spin spinning={loading}>
           {tu && (
             <React.Fragment>
-              <Tu task={task} key={tu.tuId} tu={tu} save={save}></Tu>
+              <Tu
+                task={task}
+                key={tu.tuId}
+                tu={tu}
+                save={save}
+                segments={getSegments(tu)}
+              ></Tu>
             </React.Fragment>
           )}
           <Divider />

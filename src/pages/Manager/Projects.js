@@ -13,7 +13,8 @@ import {
   addProject,
   cloneProject,
   saveProject,
-  removeProject
+  removeProject,
+  addProjectFiles,
 } from "./../../services";
 
 import { AppContext } from "./../../AppContext";
@@ -52,14 +53,48 @@ const Projects = () => {
     try {
       setLoading(true);
       const formData = new FormData();
-      Object.keys(values).forEach(element => {
+      Object.keys(values).forEach((element) => {
         if (element !== "files") formData.append(element, values[element]);
       });
 
-      values.files.forEach(file => {
+      values.files.forEach((file) => {
         formData.append("files[]", file.originFileObj);
       });
       await addProject(formData);
+      form.resetFields();
+      fetch(true);
+      message.success("Successful Action!");
+    } catch (error) {
+      handleError(error);
+      setLoading(false);
+    }
+  };
+
+  const addFromFiles = async (values, form) => {
+    try {
+      setLoading(true);
+      const formData = new FormData();
+      Object.keys(values).forEach((element) => {
+        if (element !== "files") formData.append(element, values[element]);
+      });
+
+      if (values.files) {
+        values.files.forEach((file) => {
+          formData.append("files[]", file.originFileObj);
+        });
+      } else {
+        values.sources.forEach((file) => {
+          formData.append("sources[]", file.originFileObj);
+        });
+        values.references.forEach((file) => {
+          formData.append("references[]", file.originFileObj);
+        });
+        values.targets.forEach((file) => {
+          formData.append("targets[]", file.originFileObj);
+        });
+      }
+
+      await addProjectFiles(formData);
       form.resetFields();
       fetch(true);
       message.success("Successful Action!");
@@ -97,7 +132,7 @@ const Projects = () => {
     }
   };
 
-  const remove = async value => {
+  const remove = async (value) => {
     try {
       setLoading(true);
       await removeProject(value.id);
@@ -110,30 +145,29 @@ const Projects = () => {
     }
   };
 
-  const handleCancel = e => {
-    console.log(e);
+  const handleCancel = (e) => {
     setVisible(false);
   };
 
-  const selectProject = value => {
+  const selectProject = (value) => {
     setMode("edit");
     setProject(value);
     setVisible(true);
   };
 
-  const selectClone = value => {
+  const selectClone = (value) => {
     setMode("clone");
     setProject(value);
     setVisible(true);
   };
 
-  const showsTuvs = value => {
+  const showsTuvs = (value) => {
     setMode("tuvs");
     setTab("tuvs");
     setProject(value);
   };
 
-  const showsTasks = value => {
+  const showsTasks = (value) => {
     setMode("tasks");
     setTab("tasks");
     setProject(value);
@@ -168,7 +202,7 @@ const Projects = () => {
     </Button>
   );
 
-  const callback = key => {
+  const callback = (key) => {
     if (key !== "tuvs") {
       setMode("add");
       setProject(null);
@@ -198,7 +232,7 @@ const Projects = () => {
               <div
                 className="img-card__cover"
                 style={{
-                  backgroundImage: `url('${IMAGE}')`
+                  backgroundImage: `url('${IMAGE}')`,
                 }}
               ></div>
             </article>
@@ -250,6 +284,7 @@ const Projects = () => {
           <ProjectForm
             loading={loading}
             add={add}
+            addFromFiles={addFromFiles}
             save={save}
             project={project}
           />

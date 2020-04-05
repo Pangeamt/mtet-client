@@ -1,0 +1,6 @@
+.segments {
+  margin: 0 !important;
+}
+.segments.active {
+  font-size: 15px;
+}

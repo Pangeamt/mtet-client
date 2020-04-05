@@ -6,13 +6,15 @@ import {
   Divider,
   Slider,
   InputNumber,
-  Button
+  Button,
 } from "antd";
 
 import EventListener from "react-event-listener";
 import { AppContext } from "./../../AppContext";
 
-const { Text, Paragraph } = Typography;
+import "./style.css";
+
+const { Paragraph, Title } = Typography;
 
 const Tuv = ({ item, saveValue, user }) => {
   const [tuv, setTuv] = useState(null);
@@ -22,13 +24,11 @@ const Tuv = ({ item, saveValue, user }) => {
     if (item) {
       setTuv(item);
       setValue(item.value);
-      console.log(item);
-      console.log(user);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onChange = value => {
+  const onChange = (value) => {
     setValue(value);
     saveValue(tuv.id, value);
   };
@@ -41,7 +41,7 @@ const Tuv = ({ item, saveValue, user }) => {
             <Paragraph
               className="p-1"
               style={{
-                backgroundColor: "#f0f2f5"
+                backgroundColor: "#f0f2f5",
               }}
             >
               {tuv.text}
@@ -78,7 +78,7 @@ const Tuv = ({ item, saveValue, user }) => {
   );
 };
 
-const Tu = ({ tu, isLoading, save, task }) => {
+const Tu = ({ tu, isLoading, save, task, segments }) => {
   const { user } = useContext(AppContext);
 
   const [data, setData] = useState(null);
@@ -88,64 +88,79 @@ const Tu = ({ tu, isLoading, save, task }) => {
     if (tu) {
       setData(tu);
       const array = [];
-      tu.tuvs.forEach(element => {
+      tu.tuvs.forEach((element) => {
         array.push({ id: element.id, value: element.value });
       });
       setTuvs(array);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const saveAll = _tuvs => {
+  const saveAll = (_tuvs) => {
     save(_tuvs);
   };
 
   const saveValue = (id, value) => {
-    tuvs.forEach(element => {
+    tuvs.forEach((element) => {
       if (element.id === id) element.value = value;
     });
     setTuvs(tuvs);
   };
 
-  const keydownHandler = e => {
+  const keydownHandler = (e) => {
     if (e.keyCode === 13 && e.ctrlKey) {
       saveAll(tuvs);
     }
   };
 
   return (
-    <Row className="mt-5">
+    <Row className="mt-2">
       <EventListener target={document} onKeyDown={keydownHandler} />
       {data && (
         <Col>
           <Row>
-            <Col xs={24}>
-              <Text strong>Source ({data.sourceLang})</Text>
-              <Paragraph
-                className="p-1 mr-2"
-                style={{
-                  backgroundColor: "#f0f2f5"
-                }}
-              >
+            <Col className="p-2 mt-2" xs={24}>
+              <Title level={4} strong>
+                Source ({data.sourceLang})
+              </Title>
+              {segments.prev.map((item) => (
+                <Paragraph className="segments">
+                  {task.showSourceText ? item.source : null}
+                </Paragraph>
+              ))}
+              <Paragraph strong className="segments active">
                 {task.showSourceText ? data.source : null}
               </Paragraph>
+
+              {segments.next.map((item) => (
+                <Paragraph className="segments">
+                  {task.showSourceText ? item.source : null}
+                </Paragraph>
+              ))}
             </Col>
-            <Col xs={24}>
-              <Text strong>Reference ({data.referenceLang})</Text>
-              <Paragraph
-                className="p-1 mr-2"
-                style={{
-                  backgroundColor: "#f0f2f5"
-                }}
-              >
-                {task.showReferenceText ? data.reference : null}
+            <Col className="p-2 mt-2" xs={24}>
+              <Title level={4} strong>
+                Reference ({data.referenceLang})
+              </Title>
+              {segments.prev.map((item) => (
+                <Paragraph className="segments">
+                  {task.showSourceText ? item.reference : null}
+                </Paragraph>
+              ))}
+              <Paragraph strong className="segments active">
+                {task.showSourceText ? data.reference : null}
               </Paragraph>
+              {segments.next.map((item) => (
+                <Paragraph className="segments">
+                  {task.showSourceText ? item.reference : null}
+                </Paragraph>
+              ))}
             </Col>
           </Row>
           <Divider />
           {data.tuvs && data.tuvs.length > 0 && (
             <React.Fragment>
-              {data.tuvs.map(item => {
+              {data.tuvs.map((item) => {
                 return (
                   <Tuv
                     item={item}

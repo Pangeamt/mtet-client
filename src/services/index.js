@@ -99,6 +99,16 @@ export const addProject = formData => {
   });
 };
 
+export const addProjectFiles = formData => {
+  const token = reactLocalStorage.get("token", false);
+  axios.defaults.headers.common["x-access-token"] = token;
+  return axios.post(`${HOST_API}/v1/projects/create`, formData, {
+    headers: {
+      "content-type": "multipart/form-data"
+    }
+  });
+};
+
 export const getEvaluators = () => {
   const token = reactLocalStorage.get("token", false);
   axios.defaults.headers.common["x-access-token"] = token;
