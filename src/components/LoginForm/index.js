@@ -1,7 +1,7 @@
 import React from "react";
 import { Form, Input, Button } from "antd";
 
-import LOGO from "./../../assets/NTEU_MTET.jpg";
+import LOGO from "./../../assets/NTEU_MTET.png";
 const FormItem = Form.Item;
 
 const LoginForm = ({ form, loading, login }) => {

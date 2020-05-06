@@ -49,7 +49,7 @@ const Projects = () => {
     }
   };
 
-  const add = async (values, form) => {
+  const add = async (values, form, { setFileList }) => {
     try {
       setLoading(true);
       const formData = new FormData();
@@ -63,6 +63,7 @@ const Projects = () => {
       await addProject(formData);
       form.resetFields();
       fetch(true);
+      setFileList([]);
       message.success("Successful Action!");
     } catch (error) {
       handleError(error);
@@ -70,7 +71,11 @@ const Projects = () => {
     }
   };
 
-  const addFromFiles = async (values, form) => {
+  const addFromFiles = async (
+    values,
+    form,
+    { setFileSrc, setFileRef, setFilesTgt }
+  ) => {
     try {
       setLoading(true);
       const formData = new FormData();
@@ -97,6 +102,9 @@ const Projects = () => {
       await addProjectFiles(formData);
       form.resetFields();
       fetch(true);
+      setFileSrc([]);
+      setFileRef([]);
+      setFilesTgt([]);
       message.success("Successful Action!");
     } catch (error) {
       handleError(error);

@@ -6,7 +6,7 @@ import { navigate, Link } from "@reach/router";
 
 import "./style.css";
 import avatarDropdown from "./avatarDropdown";
-import LOGO from "./../../assets/NTEU_MTET.jpg";
+import LOGO from "./../../assets/NTEU_MTET.png";
 import { AppContext } from "./../../AppContext";
 
 const { Header } = Layout;

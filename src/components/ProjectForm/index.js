@@ -80,14 +80,14 @@ const ProjectFormCmp = ({
         }
         if (!project) {
           if (dataSource === 1) {
-            await add(values, form);
-            setFileList([]);
+            await add(values, form, { setFileList });
           }
           if (dataSource === 2) {
-            await addFromFiles(values, form);
-            setFileSrc([]);
-            setFileRef([]);
-            setFilesTgt([]);
+            await addFromFiles(values, form, {
+              setFileSrc,
+              setFileRef,
+              setFilesTgt,
+            });
           }
         } else {
           save(values, form);
@@ -381,11 +381,7 @@ const ProjectFormCmp = ({
                       </Col>
                       <Col span={14}>
                         <Alert
-                          message={
-                            <span>
-                              "sources.en.txt"
-                            </span>
-                          }
+                          message={<span>"sources.en.txt"</span>}
                           type="info"
                           showIcon
                         />
@@ -407,11 +403,7 @@ const ProjectFormCmp = ({
                       </Col>
                       <Col span={14}>
                         <Alert
-                          message={
-                            <span>
-                              "references.en.txt"
-                            </span>
-                          }
+                          message={<span>"references.en.txt"</span>}
                           type="info"
                           showIcon
                         />
@@ -433,11 +425,7 @@ const ProjectFormCmp = ({
                       </Col>
                       <Col span={14}>
                         <Alert
-                          message={
-                            <span>
-                              "Google.en.txt"
-                            </span>
-                          }
+                          message={<span>"Google.en.txt"</span>}
                           type="info"
                           showIcon
                         />
