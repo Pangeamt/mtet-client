@@ -4,14 +4,7 @@ import ReactDOM from "react-dom";
 import "react-app-polyfill/ie11";
 import "react-app-polyfill/stable";
 
-// 3rd
-import "./styles/antd.less";
-import "./styles/bootstrap/bootstrap.scss";
-// custom
-import "./styles/layout.scss";
-import "./styles/theme.scss";
-import "./styles/ui.scss";
-import "./styles/vendors.scss";
+import './styles/global.css'
 
 import { AppContext } from "./AppContext";
 import { App } from "./App";
@@ -25,7 +18,7 @@ const Container = () => {
     user,
     setUser,
     token,
-    setToken
+    setToken,
   ]);
 
   return (
