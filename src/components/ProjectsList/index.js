@@ -1,14 +1,14 @@
 import React from "react";
+
 import {
-  Table,
-  Button,
-  Popconfirm,
-  Icon,
-  Tooltip,
-  Progress,
-  Dropdown,
-  Menu
-} from "antd";
+  CopyOutlined,
+  DownOutlined,
+  EditOutlined,
+  LoadingOutlined,
+  QuestionCircleOutlined,
+} from '@ant-design/icons';
+
+import { Table, Button, Popconfirm, Tooltip, Progress, Dropdown, Menu } from "antd";
 import numeral from "numeral";
 import styled from "styled-components";
 
@@ -123,7 +123,7 @@ const ProjectsList = ({
 
             {record.projects && record.projects.length === 0 && (
               <Menu.Item key="3">
-                <Icon type="loading" />
+                <LoadingOutlined />
                 loading...
               </Menu.Item>
             )}
@@ -135,7 +135,7 @@ const ProjectsList = ({
               }}
               disabled={record.Tasks && record.Tasks.length > 0}
             >
-              <Icon type="edit" />
+              <EditOutlined />
               Edit
             </Menu.Item>
             <Menu.Item
@@ -144,7 +144,7 @@ const ProjectsList = ({
                 selectClone(record);
               }}
             >
-              <Icon type="copy" />
+              <CopyOutlined />
               Clone
             </Menu.Item>
           </Menu>
@@ -153,7 +153,7 @@ const ProjectsList = ({
           <React.Fragment>
             <Dropdown overlay={menu}>
               <Button size="small" className="mr-2">
-                Actions <Icon type="down" />
+                Actions <DownOutlined />
               </Button>
             </Dropdown>
             <Tooltip placement="top" title="Delete">
@@ -163,7 +163,7 @@ const ProjectsList = ({
                   remove(record);
                 }}
                 icon={
-                  <Icon type="question-circle-o" style={{ color: "red" }} />
+                  <QuestionCircleOutlined style={{ color: "red" }} />
                 }
               >
                 <ButtonActions type="danger" icon="delete" size="small" />

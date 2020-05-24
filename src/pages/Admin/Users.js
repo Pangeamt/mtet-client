@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { UserAddOutlined } from '@ant-design/icons';
 import { Tabs, Button, Modal, message, Card } from "antd";
 
 import UsersList from "./../../components/UsersList";
@@ -122,7 +123,7 @@ const Users = () => {
         setVisible(true);
       }}
       type="primary"
-      icon="user-add"
+      icon={<UserAddOutlined />}
     >
       Add User
     </Button>

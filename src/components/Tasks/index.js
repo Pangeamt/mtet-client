@@ -1,4 +1,16 @@
 import React, { useEffect, useState } from "react";
+
+import {
+  DeleteOutlined,
+  EyeInvisibleTwoTone,
+  EyeTwoTone,
+  MailOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
+
+import { Icon as LegacyIcon } from '@ant-design/compatible';
 import {
   Row,
   Col,
@@ -9,10 +21,9 @@ import {
   List,
   Typography,
   Progress,
-  Icon,
   Card,
   Tooltip,
-  Popconfirm
+  Popconfirm,
 } from "antd";
 import numeral from "numeral";
 
@@ -252,7 +263,7 @@ const Tasks = ({ project }) => {
               <Col xs={20}>
                 {`${record.user.nickname.toUpperCase()}`}
                 <br />
-                <Icon type="mail" /> {record.user.email}
+                <MailOutlined /> {record.user.email}
               </Col>
               <Col xs={4}>
                 <Button
@@ -262,7 +273,7 @@ const Tasks = ({ project }) => {
                   onClick={() => {
                     showModal(record);
                   }}
-                  icon="user"
+                  icon={<UserOutlined />}
                   size="small"
                 ></Button>
               </Col>
@@ -272,7 +283,7 @@ const Tasks = ({ project }) => {
           return (
             <Button
               className="assign-e"
-              icon="plus"
+              icon={<PlusOutlined />}
               onClick={() => {
                 showModal(record);
               }}
@@ -293,23 +304,15 @@ const Tasks = ({ project }) => {
           <div>
             &nbsp;&nbsp;
             {record.showReferenceText ? (
-              <Icon type="eye" theme="twoTone" twoToneColor="#52c41a" />
+              <EyeTwoTone twoToneColor="#52c41a" />
             ) : (
-              <Icon
-                type="eye-invisible"
-                theme="twoTone"
-                twoToneColor="#eb2f96"
-              />
+              <EyeInvisibleTwoTone twoToneColor="#eb2f96" />
             )}
             &nbsp;/&nbsp;
             {text ? (
-              <Icon type="eye" theme="twoTone" twoToneColor="#52c41a" />
+              <EyeTwoTone twoToneColor="#52c41a" />
             ) : (
-              <Icon
-                type="eye-invisible"
-                theme="twoTone"
-                twoToneColor="#eb2f96"
-              />
+              <EyeInvisibleTwoTone twoToneColor="#eb2f96" />
             )}
           </div>
         );
@@ -350,7 +353,7 @@ const Tasks = ({ project }) => {
                 <Button
                   className="ml-2 right"
                   loading={loadingActive === `load-${record.id}`}
-                  icon="delete"
+                  icon={<DeleteOutlined />}
                   type="danger"
                   size="small"
                 ></Button>
@@ -365,7 +368,7 @@ const Tasks = ({ project }) => {
                   restart(record.id);
                 }}
                 size="small"
-                icon="reload"
+                icon={<ReloadOutlined />}
               ></Button>
             </Tooltip>
             <Tooltip placement="top" title="Activate/Deactivate Task">
@@ -377,7 +380,7 @@ const Tasks = ({ project }) => {
                 }}
                 size="small"
                 type={record.active ? "primary" : "danger"}
-                icon={record.active ? "check" : "close"}
+                icon={<LegacyIcon type={record.active ? "check" : "close"} />}
               ></Button>
             </Tooltip>
           </React.Fragment>

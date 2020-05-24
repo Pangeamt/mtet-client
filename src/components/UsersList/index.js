@@ -1,5 +1,6 @@
 import React from "react";
-import { Table, Button, Popconfirm, Icon } from "antd";
+import { QuestionCircleOutlined } from '@ant-design/icons';
+import { Table, Button, Popconfirm } from "antd";
 
 import styled from "styled-components";
 
@@ -56,7 +57,7 @@ const UsersList = ({ loading, users, remove, select, showPassForm }) => {
             onConfirm={() => {
               remove(record);
             }}
-            icon={<Icon type="question-circle-o" style={{ color: "red" }} />}
+            icon={<QuestionCircleOutlined style={{ color: "red" }} />}
           >
             <ButtonActions
               type="danger"

@@ -1,5 +1,7 @@
 import React from "react";
-import { Row, Col, Form, InputNumber, Button, Checkbox } from "antd";
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Row, Col, InputNumber, Button, Checkbox } from "antd";
 
 const TasksFormCmp = ({ form, create, tasks }) => {
   const handleSubmit = e => {

@@ -1,16 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "@reach/router";
-import {
-  Card,
-  Pagination,
-  message,
-  Spin,
-  Divider,
-  Typography,
-  Icon,
-  Row,
-  Col
-} from "antd";
+import { ArrowLeftOutlined } from '@ant-design/icons';
+import { Card, Pagination, message, Spin, Divider, Typography, Row, Col } from "antd";
 import { navigate } from "@reach/router";
 import styled from "styled-components";
 
@@ -145,7 +136,7 @@ const Tasks = ({ id }) => {
               {" "}
               <TextLink>
                 {" "}
-                <Icon type="arrow-left" /> Tasks
+                <ArrowLeftOutlined /> Tasks
               </TextLink>
             </Link>{" "}
           </Col>

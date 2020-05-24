@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import { Form, Input, Tooltip, Icon, Button, Select } from "antd";
+import { QuestionCircleOutlined } from '@ant-design/icons';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Input, Tooltip, Button, Select } from "antd";
 
 const UserFormCmp = ({ form, loading, addUser }) => {
   const [confirmDirty, setConfirmDirty] = useState();
@@ -114,7 +117,7 @@ const UserFormCmp = ({ form, loading, addUser }) => {
           <span>
             Nickname&nbsp;
             <Tooltip title="What do you want others to call you?">
-              <Icon type="question-circle-o" />
+              <QuestionCircleOutlined />
             </Tooltip>
           </span>
         }

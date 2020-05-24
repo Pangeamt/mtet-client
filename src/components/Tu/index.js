@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
+import { SaveOutlined } from '@ant-design/icons';
 import {
   Row,
   Col,
@@ -176,7 +177,7 @@ const Tu = ({ tu, isLoading, save, task, segments }) => {
                 }}
                 className="right mt-3"
                 type="primary"
-                icon="save"
+                icon={<SaveOutlined />}
               >
                 Save
               </Button>

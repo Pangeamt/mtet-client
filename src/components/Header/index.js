@@ -1,6 +1,8 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useContext } from "react";
-import { Layout, Dropdown, Icon, Avatar, Row, Col } from "antd";
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { UserOutlined } from '@ant-design/icons';
+import { Layout, Dropdown, Avatar, Row, Col } from "antd";
 import { reactLocalStorage } from "reactjs-localstorage";
 import { navigate, Link } from "@reach/router";
 
@@ -40,7 +42,7 @@ const Section = props => {
                 >
                   <a href="#" className="list-inline-item">
                     {" "}
-                    <Icon
+                    <LegacyIcon
                       type={props.collapsed ? "menu-unfold" : "menu-fold"}
                       className="list-icon"
                     />{" "}
@@ -67,7 +69,7 @@ const Section = props => {
                   placement="bottomRight"
                 >
                   <a className="ant-dropdown-link no-link-style" href="#">
-                    <Avatar icon="user" size="small" />
+                    <Avatar icon={<UserOutlined />} size="small" />
                   </a>
                 </Dropdown>
               </div>

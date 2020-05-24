@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import { PlusOutlined } from '@ant-design/icons';
 import { Row, Col, Tabs, Button, Modal, message, Card } from "antd";
 
 import ProjectsList from "./../../components/ProjectsList";
@@ -204,7 +205,7 @@ const Projects = () => {
         setVisible(true);
       }}
       type="primary"
-      icon="plus"
+      icon={<PlusOutlined />}
     >
       Add Project
     </Button>

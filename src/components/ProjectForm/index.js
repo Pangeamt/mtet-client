@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { QuestionCircleOutlined, UploadOutlined } from '@ant-design/icons';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
 import {
-  Form,
   Input,
   Upload,
-  Icon,
   Button,
   Select,
   message,
@@ -308,7 +309,7 @@ const ProjectFormCmp = ({
           <span>
             Segments&nbsp;
             <Tooltip title="Segments before and after display (Context)">
-              <Icon type="question-circle-o" />
+              <QuestionCircleOutlined />
             </Tooltip>
           </span>
         }
@@ -350,7 +351,7 @@ const ProjectFormCmp = ({
             <Form.Item {...tailFormItemLayout}>
               <Upload {...props}>
                 <Button disabled={fileList.length}>
-                  <Icon type="upload" /> Select Tmx File
+                  <UploadOutlined /> Select Tmx File
                 </Button>
               </Upload>
             </Form.Item>
@@ -375,7 +376,7 @@ const ProjectFormCmp = ({
                       <Col span={10}>
                         <Upload {...propsSrc}>
                           <Button disabled={fileSrc.length}>
-                            <Icon type="upload" /> Select Sources File
+                            <UploadOutlined /> Select Sources File
                           </Button>
                         </Upload>
                       </Col>
@@ -397,7 +398,7 @@ const ProjectFormCmp = ({
                       <Col span={10}>
                         <Upload {...propsRef}>
                           <Button disabled={fileRef.length}>
-                            <Icon type="upload" /> Select References File
+                            <UploadOutlined /> Select References File
                           </Button>
                         </Upload>
                       </Col>
@@ -419,7 +420,7 @@ const ProjectFormCmp = ({
                       <Col span={10}>
                         <Upload {...propsTgt}>
                           <Button>
-                            <Icon type="upload" /> Select Target Files
+                            <UploadOutlined /> Select Target Files
                           </Button>
                         </Upload>
                       </Col>
