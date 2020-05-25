@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { SaveOutlined } from '@ant-design/icons';
+import { SaveOutlined } from "@ant-design/icons";
 import {
   Row,
   Col,
@@ -8,6 +8,7 @@ import {
   Slider,
   InputNumber,
   Button,
+  Alert,
 } from "antd";
 
 import EventListener from "react-event-listener";
@@ -49,7 +50,7 @@ const Tuv = ({ item, saveValue, user }) => {
             </Paragraph>
           </Col>
           <Col xs={24}>
-            <Row className="p-1">
+            <Row style={{ padding: 10 }}>
               <Col span={12}>
                 <Slider
                   disabled={user.id !== item.UserId}
@@ -115,12 +116,12 @@ const Tu = ({ tu, isLoading, save, task, segments }) => {
   };
 
   return (
-    <Row className="mt-2">
+    <Row>
       <EventListener target={document} onKeyDown={keydownHandler} />
       {data && (
         <Col>
           <Row>
-            <Col className="p-2 mt-2" xs={24}>
+            <Col xs={24}>
               <Title level={4} strong>
                 Source ({data.sourceLang})
               </Title>
@@ -139,7 +140,7 @@ const Tu = ({ tu, isLoading, save, task, segments }) => {
                 </Paragraph>
               ))}
             </Col>
-            <Col className="p-2 mt-2" xs={24}>
+            <Col xs={24}>
               <Title level={4} strong>
                 Reference ({data.referenceLang})
               </Title>
@@ -162,20 +163,29 @@ const Tu = ({ tu, isLoading, save, task, segments }) => {
           {data.tuvs && data.tuvs.length > 0 && (
             <React.Fragment>
               {data.tuvs.map((item) => {
-                return (
-                  <Tuv
-                    item={item}
-                    user={user}
-                    isLoading={isLoading}
-                    saveValue={saveValue}
-                  />
-                );
+                if (item.text) {
+                  return (
+                    <Tuv
+                      item={item}
+                      user={user}
+                      isLoading={isLoading}
+                      saveValue={saveValue}
+                    />
+                  );
+                } else {
+                  return (
+                    <Alert
+                      message={`Tuv incorrecto (${item.id})`}
+                      type="error"
+                    />
+                  );
+                }
               })}
               <Button
                 onClick={() => {
                   saveAll(tuvs);
                 }}
-                className="right mt-3"
+                className="right"
                 type="primary"
                 icon={<SaveOutlined />}
               >

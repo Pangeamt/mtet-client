@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import {
   CopyOutlined,
@@ -17,7 +17,13 @@ import {
   Progress,
   Dropdown,
   Menu,
+  Input,
+  Space,
 } from "antd";
+
+import Highlighter from "react-highlight-words";
+import { SearchOutlined } from "@ant-design/icons";
+
 import numeral from "numeral";
 import styled from "styled-components";
 
@@ -37,12 +43,99 @@ const ProjectsList = ({
   selectClone,
   showsTuvs,
   showsTasks,
+  handleTableChange,
+  pagination,
 }) => {
+  const [searchText, setSearchText] = useState("");
+  const [searchedColumn, setSearchedColumn] = useState("");
+  const [searchInput, setSearchInput] = useState(null);
+
+  const getColumnSearchProps = (dataIndex) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={(node) => {
+            setSearchInput(node);
+          }}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{ width: 188, marginBottom: 8, display: "block" }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => handleReset(clearFilters)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex]
+        .toString()
+        .toLowerCase()
+        .includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: (visible) => {
+      if (visible) {
+        setTimeout(() => {
+          if (searchInput) searchInput.select();
+        });
+      }
+    },
+    render: (text) =>
+      searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text.toString()}
+        />
+      ) : (
+        text
+      ),
+  });
+
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    setSearchText("");
+  };
+
   const model = [
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
+      sorter: (a, b) => a.name - b.name,
+      ...getColumnSearchProps("name"),
       // eslint-disable-next-line jsx-a11y/anchor-is-valid
       render: (text) => <a>{text}</a>,
     },
@@ -50,11 +143,15 @@ const ProjectsList = ({
       title: "Source",
       dataIndex: "source",
       key: "source",
+      sorter: (a, b) => a.source - b.source,
+      ...getColumnSearchProps("source"),
     },
     {
       title: "Target",
       dataIndex: "target",
       key: "target",
+      sorter: (a, b) => a.target - b.target,
+      ...getColumnSearchProps("target"),
     },
     {
       title: "Type",
@@ -63,13 +160,13 @@ const ProjectsList = ({
     },
     {
       title: "#Tus",
-      dataIndex: "tus",
-      key: "tus",
+      dataIndex: "nTus",
+      key: "nTus",
     },
     {
       title: "#Tuvs",
-      dataIndex: "tuvs",
-      key: "tuvs",
+      dataIndex: "nTuvs",
+      key: "nTuvs",
     },
     {
       title: "Complete %",
@@ -112,7 +209,7 @@ const ProjectsList = ({
               />
               Tasks
             </Menu.Item>
-            {record.projects && record.projects.length > 0 && (
+            {record.tuvs && record.tuvs.length > 0 && (
               <Menu.Item
                 key="2"
                 onClick={() => {
@@ -132,7 +229,7 @@ const ProjectsList = ({
               </Menu.Item>
             )}
 
-            {record.projects && record.projects.length === 0 && (
+            {record.tuvs && record.tuvs.length === 0 && (
               <Menu.Item key="3">
                 <LoadingOutlined />
                 loading...
@@ -194,6 +291,9 @@ const ProjectsList = ({
       columns={model}
       dataSource={projects}
       size="small"
+      onChange={handleTableChange}
+      pagination={pagination}
+      rowKey={(record) => record.id}
     />
   );
 };

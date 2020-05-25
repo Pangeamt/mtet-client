@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "@reach/router";
-import { ArrowLeftOutlined } from '@ant-design/icons';
-import { Card, Pagination, message, Spin, Divider, Typography, Row, Col } from "antd";
+import { ArrowLeftOutlined } from "@ant-design/icons";
+import {
+  Card,
+  Pagination,
+  message,
+  Spin,
+  Divider,
+  Typography,
+  Row,
+  Col,
+  Layout,
+} from "antd";
 import { navigate } from "@reach/router";
 import styled from "styled-components";
 
@@ -9,6 +19,7 @@ import Tu from "./../../components/Tu";
 import { handleError, saveTask, getEvaluatorsTasks } from "./../../services";
 
 const { Text } = Typography;
+const { Content } = Layout;
 
 const TextLink = styled(Text)`
   cursor: pointer;
@@ -18,6 +29,10 @@ const TextLink = styled(Text)`
     text-decoration: underline;
     font-weight: 500;
   }
+`;
+
+const ContentWrapper = styled(Content)`
+  padding: 50px;
 `;
 
 const Tasks = ({ id }) => {
@@ -36,7 +51,7 @@ const Tasks = ({ id }) => {
     try {
       setLoading(true);
       const {
-        data: { docs, task }
+        data: { docs, task },
       } = await getEvaluatorsTasks(id);
 
       setTuvs(docs);
@@ -64,7 +79,7 @@ const Tasks = ({ id }) => {
     }
   };
 
-  const save = async values => {
+  const save = async (values) => {
     message.loading("Action in progress..", 0);
     try {
       await saveTask(values, task.id);
@@ -78,7 +93,7 @@ const Tasks = ({ id }) => {
     }
   };
 
-  const onChange = pageNumber => {
+  const onChange = (pageNumber) => {
     setCurrent(pageNumber);
     setTu(tuvs[pageNumber - 1]);
   };
@@ -94,10 +109,10 @@ const Tasks = ({ id }) => {
     }
   };
 
-  const getSegments = tu => {
+  const getSegments = (tu) => {
     const segments = {
       next: [],
-      prev: []
+      prev: [],
     };
     for (let i = 0; i < tuvs.length; i++) {
       if (tu.tuId === tuvs[i].tuId) {
@@ -119,8 +134,8 @@ const Tasks = ({ id }) => {
   };
 
   return (
-    <div className="container mt-5">
-      <Card>
+    <ContentWrapper>
+      <Card style={{ padding: 20 }}>
         <Row>
           <Col xs={24} md={12}>
             <Text underline strong>
@@ -157,14 +172,14 @@ const Tasks = ({ id }) => {
           <Pagination
             key={current}
             defaultCurrent={current}
-            className="mt-4 right"
+            className="right"
             pageSize={1}
             total={tuvs.length}
             onChange={onChange}
           />
         </Spin>
       </Card>
-    </div>
+    </ContentWrapper>
   );
 };
 

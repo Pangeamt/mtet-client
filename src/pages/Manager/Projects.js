@@ -45,6 +45,7 @@ const TextSub = styled(Text)`
 const Projects = () => {
   const { user } = useContext(AppContext);
 
+  const [pagination, setPagination] = useState({});
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
   const [projects, setProjects] = useState([]);
@@ -56,17 +57,39 @@ const Projects = () => {
     fetch(true);
   }, []);
 
-  const fetch = async (load = false) => {
+  const fetch = async (params = {}) => {
     try {
-      if (load) setLoading(true);
-      const { data } = await getProjects();
-      setProjects(data);
-      setLoading(false);
+      setLoading(true);
+      const {
+        data: { docs, total },
+      } = await getProjects(params);
+      const pag = { ...pagination };
+      pag.total = total;
+
+      setProjects(docs);
       setVisible(false);
+      setLoading(false);
+      setPagination(pag);
     } catch (error) {
       handleError(error);
       setLoading(false);
     }
+  };
+
+  const handleTableChange = (pag, filters, sorter) => {
+    const pager = {
+      ...pagination,
+    };
+    pager.current = pag.current;
+    setPagination(pager);
+
+    fetch({
+      results: pag.pageSize,
+      page: pag.current,
+      sortField: sorter.field,
+      sortOrder: sorter.order,
+      ...filters,
+    });
   };
 
   const add = async (values, form, { setFileList }) => {
@@ -264,7 +287,7 @@ const Projects = () => {
           </Card>
         </Col>
         <Col xs={24} md={18}>
-          <Card style={{ minHeight: 340,padding:20 }}>
+          <Card style={{ minHeight: 340, padding: 20 }}>
             <Tabs
               activeKey={tab}
               tabBarExtraContent={
@@ -274,6 +297,8 @@ const Projects = () => {
             >
               <TabPane tab="Projects" key="projects">
                 <ProjectsList
+                  pagination={pagination}
+                  handleTableChange={handleTableChange}
                   projects={projects}
                   loading={loading}
                   select={selectProject}
@@ -283,9 +308,9 @@ const Projects = () => {
                   showsTasks={showsTasks}
                 />
               </TabPane>
-              {mode === "tuvs" && project && project.projects.length && (
+              {mode === "tuvs" && project && project.tuvs.length && (
                 <TabPane tab={`Tuvs (${project.name})`} key="tuvs">
-                  <TuvsManager tuvs={project.projects} />
+                  <TuvsManager tuvs={project.tuvs} />
                 </TabPane>
               )}
               {mode === "tasks" && project && (

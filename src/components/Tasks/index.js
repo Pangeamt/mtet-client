@@ -18,7 +18,6 @@ import {
   message,
   Modal,
   Button,
-  List,
   Typography,
   Progress,
   Card,
@@ -42,7 +41,7 @@ import {
 
 import "./style.css";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const ButtonActions = styled(Button)`
   margin-right: 10px;
@@ -435,7 +434,7 @@ const Tasks = ({ project }) => {
   ];
   return (
     <Row>
-      <Col xs={24} className="p-2">
+      <Col xs={24}>
         <Button
           disabled={loading}
           style={{ float: "right", position: "relative", zIndex: 100 }}

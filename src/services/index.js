@@ -57,10 +57,21 @@ export const removeUser = id => {
   return axios.delete(`${HOST_API}/v1/users/${id}`);
 };
 
-export const getProjects = () => {
+// export const getProjects = () => {
+//   const token = reactLocalStorage.get("token", false);
+//   axios.defaults.headers.common["x-access-token"] = token;
+//   return axios.get(`${HOST_API}/v1/projects`);
+// };
+
+export const getProjects = params => {
   const token = reactLocalStorage.get("token", false);
   axios.defaults.headers.common["x-access-token"] = token;
-  return axios.get(`${HOST_API}/v1/projects`);
+  return axios.get(`${HOST_API}/v1/projects`, {
+    params: {
+      results: 20,
+      ...params
+    }
+  });
 };
 
 export const removeProject = id => {
