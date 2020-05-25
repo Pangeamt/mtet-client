@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useContext } from "react";
-import { Icon as LegacyIcon } from '@ant-design/compatible';
-import { UserOutlined } from '@ant-design/icons';
+import { Icon as LegacyIcon } from "@ant-design/compatible";
+import { UserOutlined } from "@ant-design/icons";
 import { Layout, Dropdown, Avatar, Row, Col } from "antd";
 import { reactLocalStorage } from "reactjs-localstorage";
 import { navigate, Link } from "@reach/router";
@@ -13,7 +13,7 @@ import { AppContext } from "./../../AppContext";
 
 const { Header } = Layout;
 
-const Section = props => {
+const Section = (props) => {
   const { user, setUser, setToken } = useContext(AppContext);
 
   const logout = () => {
@@ -54,14 +54,17 @@ const Section = props => {
                   src={LOGO}
                   alt=""
                   style={{
-                    height: 50,
-                    marginLeft: 10
+                    height: 60,
+                    marginLeft: 10,
                   }}
                 />
               </Link>
             </Col>
             <Col xs={12}>
-              <div className="right list-unstyled list-inline">
+              <div
+                className="right list-unstyled list-inline"
+                style={{ marginRight: 30 }}
+              >
                 <Dropdown
                   className="list-inline-item"
                   overlay={avatarDropdown({ user, logout })}

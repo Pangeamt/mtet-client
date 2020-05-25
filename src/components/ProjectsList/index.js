@@ -6,9 +6,18 @@ import {
   EditOutlined,
   LoadingOutlined,
   QuestionCircleOutlined,
-} from '@ant-design/icons';
+  DeleteOutlined,
+} from "@ant-design/icons";
 
-import { Table, Button, Popconfirm, Tooltip, Progress, Dropdown, Menu } from "antd";
+import {
+  Table,
+  Button,
+  Popconfirm,
+  Tooltip,
+  Progress,
+  Dropdown,
+  Menu,
+} from "antd";
 import numeral from "numeral";
 import styled from "styled-components";
 
@@ -17,6 +26,7 @@ import TUVS from "./../../assets/tuvs.png";
 
 const ButtonActions = styled(Button)`
   margin-right: 10px;
+  margin-left: 10px;
 `;
 
 const ProjectsList = ({
@@ -26,7 +36,7 @@ const ProjectsList = ({
   select,
   selectClone,
   showsTuvs,
-  showsTasks
+  showsTasks,
 }) => {
   const model = [
     {
@@ -34,36 +44,37 @@ const ProjectsList = ({
       dataIndex: "name",
       key: "name",
       // eslint-disable-next-line jsx-a11y/anchor-is-valid
-      render: text => <a>{text}</a>
+      render: (text) => <a>{text}</a>,
     },
     {
       title: "Source",
       dataIndex: "source",
-      key: "source"
+      key: "source",
     },
     {
       title: "Target",
       dataIndex: "target",
-      key: "target"
+      key: "target",
     },
     {
       title: "Type",
       dataIndex: "type",
-      key: "type"
+      key: "type",
     },
     {
       title: "#Tus",
       dataIndex: "tus",
-      key: "tus"
+      key: "tus",
     },
     {
       title: "#Tuvs",
       dataIndex: "tuvs",
-      key: "tuvs"
+      key: "tuvs",
     },
     {
       title: "Complete %",
       key: "complete",
+      width: 180,
       render: (text, record) => {
         return (
           <Progress
@@ -72,13 +83,14 @@ const ProjectsList = ({
             )}
           />
         );
-      }
+      },
     },
 
     {
       title: "",
       key: "action",
       fixed: "right",
+      width: 200,
       render: (text, record) => {
         const menu = (
           <Menu>
@@ -92,7 +104,7 @@ const ProjectsList = ({
                 style={{
                   width: 15,
                   height: 15,
-                  margin: "-4px 0px 0 0px"
+                  margin: "-4px 0px 0 0px",
                 }}
                 src={TASKS}
                 alt=""
@@ -111,11 +123,10 @@ const ProjectsList = ({
                   style={{
                     width: 15,
                     height: 15,
-                    margin: "-4px 0px 0 0px"
+                    margin: "-4px 0px 0 0px",
                   }}
                   src={TUVS}
                   alt=""
-                  className="mr-2"
                 />
                 Tuvs
               </Menu.Item>
@@ -158,21 +169,23 @@ const ProjectsList = ({
             </Dropdown>
             <Tooltip placement="top" title="Delete">
               <Popconfirm
-                title="Are you sure？"
+                title="Are you sure?"
                 onConfirm={() => {
                   remove(record);
                 }}
-                icon={
-                  <QuestionCircleOutlined style={{ color: "red" }} />
-                }
+                icon={<QuestionCircleOutlined style={{ color: "red" }} />}
               >
-                <ButtonActions type="danger" icon="delete" size="small" />
+                <ButtonActions
+                  size="small"
+                  type="danger"
+                  icon={<DeleteOutlined />}
+                />
               </Popconfirm>
             </Tooltip>
           </React.Fragment>
         );
-      }
-    }
+      },
+    },
   ];
 
   return (

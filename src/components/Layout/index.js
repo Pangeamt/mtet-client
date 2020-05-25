@@ -26,17 +26,17 @@ const LayoutWrapper = styled(Layout)`
   }
 `;
 
-const AppLayout = props => {
+const AppLayout = (props) => {
   const { user } = useContext(AppContext);
   const [collapsed, setCollapse] = useState(false);
 
-  const onCollapse = collapsed => {
+  const onCollapse = (collapsed) => {
     setCollapse(collapsed);
     setCollapse(collapsed);
   };
 
   return (
-    <LayoutWrapper style={{ minHeight: "100vh" }}>
+    <LayoutWrapper theme="light" style={{ minHeight: "100vh" }}>
       {user.role === "admin" && (
         <Sider collapsed={collapsed} onCollapse={onCollapse}>
           <div className="logo" />

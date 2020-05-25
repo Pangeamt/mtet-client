@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { QuestionCircleOutlined, UploadOutlined } from '@ant-design/icons';
-import { Form } from '@ant-design/compatible';
-import '@ant-design/compatible/assets/index.css';
+import { QuestionCircleOutlined, UploadOutlined } from "@ant-design/icons";
+import { Form } from "@ant-design/compatible";
+import "@ant-design/compatible/assets/index.css";
 import {
   Input,
   Upload,
@@ -370,69 +370,72 @@ const ProjectFormCmp = ({
                 </Col>
               </Row>
               <Row>
-                <Col>
-                  <Form.Item {...tailFormItemLayout}>
-                    <Row>
-                      <Col span={10}>
+                <Col xs={24} sm={8}></Col>
+                <Col xs={24} sm={16}>
+                  <Row gutter={[16, 16]}>
+                    <Col span={10}>
+                      <Form.Item>
                         <Upload {...propsSrc}>
                           <Button disabled={fileSrc.length}>
                             <UploadOutlined /> Select Sources File
                           </Button>
                         </Upload>
-                      </Col>
-                      <Col span={14}>
-                        <Alert
-                          message={<span>"sources.en.txt"</span>}
-                          type="info"
-                          showIcon
-                        />
-                      </Col>
-                    </Row>
-                  </Form.Item>
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Alert
+                        message={<span>"sources.en.txt"</span>}
+                        type="info"
+                        showIcon
+                      />
+                    </Col>
+                  </Row>
                 </Col>
               </Row>
               <Row>
-                <Col>
-                  <Form.Item {...tailFormItemLayout}>
-                    <Row>
-                      <Col span={10}>
+                <Col xs={24} sm={8}></Col>
+                <Col xs={24} sm={16}>
+                  <Row gutter={[16, 16]}>
+                    <Col span={10}>
+                      <Form.Item>
                         <Upload {...propsRef}>
                           <Button disabled={fileRef.length}>
                             <UploadOutlined /> Select References File
                           </Button>
                         </Upload>
-                      </Col>
-                      <Col span={14}>
-                        <Alert
-                          message={<span>"references.en.txt"</span>}
-                          type="info"
-                          showIcon
-                        />
-                      </Col>
-                    </Row>
-                  </Form.Item>
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Alert
+                        message={<span>"references.en.txt"</span>}
+                        type="info"
+                        showIcon
+                      />
+                    </Col>
+                  </Row>
                 </Col>
               </Row>
               <Row>
-                <Col>
-                  <Form.Item {...tailFormItemLayout}>
-                    <Row>
-                      <Col span={10}>
+                <Col xs={24} sm={8}></Col>
+                <Col xs={24} sm={16}>
+                  <Row gutter={[16, 16]}>
+                    <Col span={10}>
+                      <Form.Item>
                         <Upload {...propsTgt}>
                           <Button>
                             <UploadOutlined /> Select Target Files
                           </Button>
                         </Upload>
-                      </Col>
-                      <Col span={14}>
-                        <Alert
-                          message={<span>"Google.en.txt"</span>}
-                          type="info"
-                          showIcon
-                        />
-                      </Col>
-                    </Row>
-                  </Form.Item>
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Alert
+                        message={<span>"Google.en.txt"</span>}
+                        type="info"
+                        showIcon
+                      />
+                    </Col>
+                  </Row>
                 </Col>
               </Row>
             </React.Fragment>

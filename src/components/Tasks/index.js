@@ -8,9 +8,9 @@ import {
   PlusOutlined,
   ReloadOutlined,
   UserOutlined,
-} from '@ant-design/icons';
+} from "@ant-design/icons";
 
-import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { Icon as LegacyIcon } from "@ant-design/compatible";
 import {
   Row,
   Col,
@@ -26,6 +26,7 @@ import {
   Popconfirm,
 } from "antd";
 import numeral from "numeral";
+import styled from "styled-components";
 
 import TaskForm from "./../TaskForm";
 import {
@@ -36,12 +37,17 @@ import {
   addTask,
   assignTask,
   restartTask,
-  activeTask
+  activeTask,
 } from "./../../services";
 
 import "./style.css";
 
 const { Title, Text } = Typography;
+
+const ButtonActions = styled(Button)`
+  margin-right: 10px;
+  margin-left: 10px;
+`;
 
 const Tasks = ({ project }) => {
   const tuvs = project.projects || [];
@@ -60,7 +66,7 @@ const Tasks = ({ project }) => {
     fetchEvaluators();
     fetch();
     const obj = {};
-    tuvs.forEach(element => {
+    tuvs.forEach((element) => {
       if (obj[element.tuId]) {
         obj[element.tuId].push(element.id);
       } else {
@@ -94,7 +100,7 @@ const Tasks = ({ project }) => {
     }
   };
 
-  const remove = async record => {
+  const remove = async (record) => {
     try {
       setLoadingActive(`load-${record.id}`);
       await removeTask(record.id);
@@ -106,12 +112,14 @@ const Tasks = ({ project }) => {
     }
   };
 
-  const handleCancel = e => {
+  const handleCancel = (e) => {
     setVisible(false);
   };
-  const handleFormCancel = e => {
+  const handleFormCancel = (e) => {
     setVisibleForm(false);
   };
+
+
 
   const createTasks = (values, form) => {
     const {
@@ -119,13 +127,13 @@ const Tasks = ({ project }) => {
       overlappingTuvs,
       percentageEvaluationsRandomlyRepeated,
       showSourceText,
-      showReferenceText
+      showReferenceText,
     } = values;
 
     const nTus = Object.keys(tus).length;
     const txe = parseInt(nTus / numberTasks) + 1;
     const copyTus = [];
-    Object.keys(tus).forEach(item => {
+    Object.keys(tus).forEach((item) => {
       copyTus.push(tus[item]);
     });
 
@@ -135,7 +143,7 @@ const Tasks = ({ project }) => {
         tus: [],
         tuvs: 0,
         showSourceText,
-        showReferenceText
+        showReferenceText,
       };
 
       for (let j = 0; j < txe; j++) {
@@ -162,14 +170,14 @@ const Tasks = ({ project }) => {
             });
           }
         }
-        aux.forEach(item => {
+        aux.forEach((item) => {
           newTasks[i].tus.push(item);
           newTasks[i].tuvs += item.length;
         });
       }
     }
     if (percentageEvaluationsRandomlyRepeated) {
-      newTasks.forEach(element => {
+      newTasks.forEach((element) => {
         let aux = element.tus;
         const ntr = parseInt(
           (element.tus.length * percentageEvaluationsRandomlyRepeated) / 100
@@ -200,7 +208,7 @@ const Tasks = ({ project }) => {
     }
   };
 
-  const assign = async evaluator => {
+  const assign = async (evaluator) => {
     try {
       setLoadingActive(`assign-${evaluator}`);
       await assignTask(evaluator, selectedTask.id);
@@ -214,7 +222,7 @@ const Tasks = ({ project }) => {
     }
   };
 
-  const restart = async task => {
+  const restart = async (task) => {
     try {
       setLoadingActive(`restart-${task}`);
       await restartTask(task);
@@ -228,7 +236,7 @@ const Tasks = ({ project }) => {
     }
   };
 
-  const active = async task => {
+  const active = async (task) => {
     try {
       setLoadingActive(`active-${task}`);
       await activeTask(task);
@@ -242,7 +250,7 @@ const Tasks = ({ project }) => {
     }
   };
 
-  const showModal = selected => {
+  const showModal = (selected) => {
     setSelectedTask(selected);
     setVisible(true);
   };
@@ -251,7 +259,7 @@ const Tasks = ({ project }) => {
     {
       title: "Id",
       key: "id",
-      dataIndex: "id"
+      dataIndex: "id",
     },
     {
       title: "Evaluator",
@@ -268,7 +276,7 @@ const Tasks = ({ project }) => {
               <Col xs={4}>
                 <Button
                   style={{
-                    marginTop: 10
+                    marginTop: 10,
                   }}
                   onClick={() => {
                     showModal(record);
@@ -293,7 +301,7 @@ const Tasks = ({ project }) => {
             </Button>
           );
         }
-      }
+      },
     },
     {
       title: "Source/Reference",
@@ -316,7 +324,7 @@ const Tasks = ({ project }) => {
             )}
           </div>
         );
-      }
+      },
     },
 
     {
@@ -332,48 +340,30 @@ const Tasks = ({ project }) => {
             />
           </span>
         );
-      }
+      },
     },
     {
       title: "",
       key: "restart",
-      width: 120,
+      width: 150,
       render: (text, record) => {
         return (
           <React.Fragment>
-            {!record.active && (
-              <Popconfirm
-                onConfirm={() => {
-                  remove(record);
-                }}
-                title="Are you sure？"
-                okText="Yes"
-                cancelText="No"
-              >
-                <Button
-                  className="ml-2 right"
-                  loading={loadingActive === `load-${record.id}`}
-                  icon={<DeleteOutlined />}
-                  type="danger"
-                  size="small"
-                ></Button>
-              </Popconfirm>
-            )}
+           
 
             <Tooltip placement="top" title="Restart Task">
-              <Button
-                className="ml-2 right"
+              <ButtonActions
                 loading={loadingActive === `restart-${record.id}`}
                 onClick={() => {
                   restart(record.id);
                 }}
                 size="small"
                 icon={<ReloadOutlined />}
-              ></Button>
+              ></ButtonActions>
             </Tooltip>
+
             <Tooltip placement="top" title="Activate/Deactivate Task">
-              <Button
-                className="right"
+              <ButtonActions
                 loading={loadingActive === `active-${record.id}`}
                 onClick={() => {
                   active(record.id);
@@ -381,12 +371,30 @@ const Tasks = ({ project }) => {
                 size="small"
                 type={record.active ? "primary" : "danger"}
                 icon={<LegacyIcon type={record.active ? "check" : "close"} />}
-              ></Button>
+              ></ButtonActions>
             </Tooltip>
+
+            {!record.active && (
+              <Popconfirm
+                onConfirm={() => {
+                  remove(record);
+                }}
+                title="Are you sure?"
+                okText="Yes"
+                cancelText="No"
+              >
+                <ButtonActions
+                  loading={loadingActive === `load-${record.id}`}
+                  icon={<DeleteOutlined />}
+                  type="danger"
+                  size="small"
+                ></ButtonActions>
+              </Popconfirm>
+            )}
           </React.Fragment>
         );
-      }
-    }
+      },
+    },
   ];
 
   const e_columns = [
@@ -394,14 +402,14 @@ const Tasks = ({ project }) => {
       title: "Nickname",
       dataIndex: "nickname",
       key: "nickname",
-      render: text => {
+      render: (text) => {
         return <span className="text-capitalize">{text}</span>;
-      }
+      },
     },
     {
       title: "Email",
       dataIndex: "email",
-      key: "email"
+      key: "email",
     },
     {
       title: "",
@@ -422,8 +430,8 @@ const Tasks = ({ project }) => {
             Select
           </Button>
         );
-      }
-    }
+      },
+    },
   ];
   return (
     <Row>
@@ -470,7 +478,7 @@ const Tasks = ({ project }) => {
         onCancel={handleFormCancel}
       >
         <Row>
-          <Col xs={24} className="p-2">
+          <Col xs={24}>
             <Row>
               {collectionsTasks.length === 0 && (
                 <Col xs={24}>
@@ -483,44 +491,42 @@ const Tasks = ({ project }) => {
               )}
 
               {collectionsTasks.length > 0 && (
-                <Col xs={24} className="p-2">
+                <Col xs={24}>
                   <Row
                     style={{
                       backgroundColor: "#f0f0ff",
-                      padding: "5px 10px"
+                      padding: "5px 10px",
                     }}
                   >
-                    <Col>
-                      <Card>
-                        <List
-                          size="small"
-                          header={<Title level={4}>New Tasks</Title>}
-                          bordered
-                          dataSource={collectionsTasks}
-                          renderItem={(item, i) => (
-                            <List.Item>
-                              <Row
-                                type="flex"
-                                justify="space-between"
-                                className="w-100"
-                              >
-                                <Col xs={4}>{i + 1}</Col>
-                                <Col xs={10}>
-                                  #Tus: <Text underline>{item.tus.length}</Text>
-                                </Col>
-                                <Col xs={10}>
-                                  #Tuvs: <Text underline>{item.tuvs}</Text>
-                                </Col>
-                              </Row>
-                            </List.Item>
-                          )}
-                        />
-                      </Card>
+                    <Col span={24}>
+                      <Row gutter={[5, 5]} className="w-100">
+                        {collectionsTasks.map((item, i) => {
+                          return (
+                            <Col span={6}>
+                              <Card style={{ padding: "10px 16px" }}>
+                                <Row
+                                  type="flex"
+                                  justify="space-between"
+                                  className="w-100"
+                                >
+                                  <Col xs={24}>{i + 1}</Col>
+                                  <Col xs={24}>
+                                    #Tus:{" "}
+                                    <Text underline>{item.tus.length}</Text>
+                                  </Col>
+                                  <Col xs={24}>
+                                    #Tuvs: <Text underline>{item.tuvs}</Text>
+                                  </Col>
+                                </Row>
+                              </Card>
+                            </Col>
+                          );
+                        })}
+                      </Row>
                     </Col>
-                    <Col className="my-5">
+                    <Col xs={24}>
                       <Button
-                        className="ml-2"
-                        style={{ float: "right" }}
+                        style={{ float: "right", marginLeft: 10 }}
                         type="primary"
                         loading={loading}
                         onClick={create}

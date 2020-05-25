@@ -1,4 +1,15 @@
 @import "~antd/dist/antd.css";
+
+body {
+  background-color: #f1f1f1 !important;
+}
+.left {
+  float: left;
+}
+.right {
+  float: right;
+}
+
 .example {
   text-align: center;
   background: rgba(0, 0, 0, 0.05);
@@ -22,5 +33,39 @@
   justify-content: center;
 }
 .logo-container img {
-  height: 150px;
+  width: 70%;
+  padding: 10px 5px 0px 5px;
+}
+
+.ant-layout-header {
+  background: #ffffff !important;
+}
+
+.img-card-v1 .img-card__cover {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: 50% 50%;
+}
+
+.ant-progress-line {
+  width: 90% !important;
+}
+
+.form-v1-container .ant-legacy-form-item label {
+  float: left;
+}
+.form-v1-container .ant-legacy-form {
+  padding: 30px;
+}
+.text-capitalize {
+  text-transform: capitalize;
+}
+
+.w-100 {
+  width: 100%;
 }
