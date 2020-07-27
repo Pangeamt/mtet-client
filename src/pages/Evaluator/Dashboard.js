@@ -8,6 +8,7 @@ import {
   Table,
   Typography,
   Card,
+  Tag,
   Layout,
 } from "antd";
 import numeral from "numeral";
@@ -80,6 +81,26 @@ const Dashboard = () => {
       key: "project",
       render: (text, record) => {
         return <span>{record.project.name}</span>;
+      },
+    },
+    {
+      title: "Type",
+      key: "type",
+      render: (text, record) => {
+        let color = "#f50";
+        if (record.project.type === "mqm") {
+          color = "#f759ab";
+        }
+        if (record.project.type === "accuracy") {
+          color = "#9254de";
+        }
+        if (record.project.type === "zero-to-one-hundred") {
+          color = "#597ef7";
+        }
+        if (record.project.type === "fluency") {
+          color = "#73d13d";
+        }
+        return <Tag color={color}> {record.project.type}</Tag>;
       },
     },
     {

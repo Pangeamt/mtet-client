@@ -300,6 +300,9 @@ const ProjectFormCmp = ({
             <Select.Option value="zero-to-one-hundred">
               Zero to one hundred
             </Select.Option>
+            <Select.Option value="fluency">Fluency</Select.Option>{" "}
+            <Select.Option value="accuracy">Accuracy</Select.Option>
+            <Select.Option value="mqm">MQM</Select.Option>
           </Select>
         )}
       </Form.Item>

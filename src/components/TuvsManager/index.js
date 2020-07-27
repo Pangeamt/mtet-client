@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Table, Tag, Typography } from "antd";
+import { Table, Tag, Typography, Input, Space, Button } from "antd";
+import Highlighter from "react-highlight-words";
+import { SearchOutlined } from "@ant-design/icons";
 import "./style.css";
 const { Text } = Typography;
 
 const TuvsManager = ({ tuvs }) => {
   const [tus, setTus] = useState([]);
+  const [searchText, setSearchText] = useState("");
+  const [searchedColumn, setSearchedColumn] = useState("");
+  const [searchInput, setSearchInput] = useState(null);
 
   useEffect(() => {
     const obj = {};
@@ -71,19 +76,105 @@ const TuvsManager = ({ tuvs }) => {
     );
   };
 
+  const getColumnSearchProps = (dataIndex) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={(node) => {
+            setSearchInput(node);
+          }}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{ width: 188, marginBottom: 8, display: "block" }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => handleReset(clearFilters)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex]
+        .toString()
+        .toLowerCase()
+        .includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: (visible) => {
+      if (visible) {
+        setTimeout(() => {
+          if (searchInput) searchInput.select();
+        });
+      }
+    },
+    render: (text) =>
+      searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text.toString()}
+        />
+      ) : (
+        text
+      ),
+  });
+
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    setSearchText("");
+  };
+
   const columns = [
     {
       title: "Tu ID",
       dataIndex: "tuId",
       key: "tuId",
-      //   ...getColumnSearchProps("origin"),
+      width: 100,
+      sorter: (a, b) => {
+        return a.tuId.localeCompare(b.tuId);
+      },
+      ...getColumnSearchProps("tuId"),
       render: (text) => <span>{text}</span>,
     },
     {
       title: "Language",
       dataIndex: "language",
       key: "language",
-      //   ...getColumnSearchProps("origin"),
+      sorter: (a, b) => {
+        return a.language.localeCompare(b.language);
+      },
+      ...getColumnSearchProps("language"),
       render: (text) => (
         <span>
           {" "}
@@ -97,14 +188,14 @@ const TuvsManager = ({ tuvs }) => {
       title: "Source",
       dataIndex: "source",
       key: "source",
-      //   ...getColumnSearchProps("origin"),
+      ...getColumnSearchProps("source"),
       render: (text) => <Text>{text}</Text>,
     },
     {
       title: "Reference",
       dataIndex: "reference",
       key: "reference",
-      //   ...getColumnSearchProps("origin"),
+      ...getColumnSearchProps("reference"),
       render: (text) => <Text>{text}</Text>,
     },
     // {

@@ -129,7 +129,6 @@ const Tasks = ({ id }) => {
         break;
       }
     }
-    console.log(segments);
     return segments;
   };
 

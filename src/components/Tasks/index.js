@@ -49,8 +49,8 @@ const ButtonActions = styled(Button)`
 `;
 
 const Tasks = ({ project }) => {
-  const tuvs = project.projects || [];
-
+  const tuvs = project.tuvs || [];
+  const [pagination, setPagination] = useState({});
   const [visible, setVisible] = useState(false);
   const [visibleForm, setVisibleForm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -86,17 +86,40 @@ const Tasks = ({ project }) => {
     }
   };
 
-  const fetch = async () => {
+  const fetch = async (params = {}) => {
     try {
       setLoading(true);
-      const { data } = await getTasks(project.id);
-      setTasks(data);
+      params["project"] = project.id;
+      const {
+        data: { docs, total },
+      } = await getTasks(params);
+      const pag = { ...pagination };
+      pag.total = total;
+
+      setTasks(docs);
       setLoadingActive(false);
       setLoading(false);
+      setPagination(pag);
     } catch (error) {
       handleError(error);
-      setLoading(true);
+      setLoading(false);
     }
+  };
+
+  const handleTableChange = (pag, filters, sorter) => {
+    const pager = {
+      ...pagination,
+    };
+    pager.current = pag.current;
+    setPagination(pager);
+
+    fetch({
+      results: pag.pageSize,
+      page: pag.current,
+      sortField: sorter.field,
+      sortOrder: sorter.order,
+      ...filters,
+    });
   };
 
   const remove = async (record) => {
@@ -117,8 +140,6 @@ const Tasks = ({ project }) => {
   const handleFormCancel = (e) => {
     setVisibleForm(false);
   };
-
-
 
   const createTasks = (values, form) => {
     const {
@@ -348,8 +369,6 @@ const Tasks = ({ project }) => {
       render: (text, record) => {
         return (
           <React.Fragment>
-           
-
             <Tooltip placement="top" title="Restart Task">
               <ButtonActions
                 loading={loadingActive === `restart-${record.id}`}
@@ -452,6 +471,9 @@ const Tasks = ({ project }) => {
           size="small"
           dataSource={tasks}
           columns={t_columns}
+          onChange={handleTableChange}
+          pagination={pagination}
+          rowKey={(record) => record.id}
         />
       </Col>
 
