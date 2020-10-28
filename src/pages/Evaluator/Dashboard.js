@@ -87,7 +87,7 @@ const Dashboard = () => {
       title: "Type",
       key: "type",
       render: (text, record) => {
-        let color = "#f50";
+        let color = "#597ef7";
         if (record.project.type === "mqm") {
           color = "#f759ab";
         }
@@ -100,7 +100,12 @@ const Dashboard = () => {
         if (record.project.type === "fluency") {
           color = "#73d13d";
         }
-        return <Tag color={color}> {record.project.type}</Tag>;
+        return (
+          <Tag color={color}>
+            {" "}
+            {record.project.type || "zero-to-one-hundred"}
+          </Tag>
+        );
       },
     },
     {
@@ -137,13 +142,13 @@ const Dashboard = () => {
       render: (text, record) => {
         return (
           <React.Fragment>
-            {record.completes === record.total && (
+            {!record.complete && record.completes === record.total && (
               <Button
                 className="right ml-2"
                 onClick={() => {
                   finish(record);
                 }}
-                style={{ width: 80 }}
+                style={{ width: 80, margin: "0 5px" }}
                 type="primary"
                 size="small"
               >
@@ -155,11 +160,15 @@ const Dashboard = () => {
               onClick={() => {
                 goToTask(record);
               }}
-              style={{ width: 80 }}
+              style={{ width: 80, margin: "0 5px" }}
               type="primary"
               size="small"
             >
-              {record.completes > 0 ? "Continue" : "Start"}
+              {record.complete && record.completes === record.total
+                ? "Check"
+                : record.completes > 0
+                ? "Continue"
+                : "Start"}
             </Button>
           </React.Fragment>
         );

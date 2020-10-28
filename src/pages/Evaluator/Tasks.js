@@ -11,6 +11,7 @@ import {
   Row,
   Col,
   Layout,
+  Alert,
 } from "antd";
 import { navigate } from "@reach/router";
 import styled from "styled-components";
@@ -32,7 +33,7 @@ const TextLink = styled(Text)`
 `;
 
 const ContentWrapper = styled(Content)`
-  padding: 50px;
+  padding: 50px 0;
 `;
 
 const Tasks = ({ id }) => {
@@ -132,18 +133,36 @@ const Tasks = ({ id }) => {
     return segments;
   };
 
+  const isComplete = (tuvs) => {
+    let complete = true;
+    tuvs.forEach((element) => {
+      if (!element.complete) complete = false;
+    });
+    return complete;
+  };
+
   return (
     <ContentWrapper>
       <Card style={{ padding: 20 }}>
         <Row>
           <Col xs={24} md={12}>
-            <Text underline strong>
-              {task
-                ? `${task.project.name} (TaskId ${task.id} ${
-                    tu ? `/ TuId ${tu.tuId}` : null
-                  })`
-                : null}
-            </Text>
+            <Row style={{ display: "flex", justifyContent: "space-between" }}>
+              <Col xs={24} md={12}>
+                <Text underline strong>
+                  {task
+                    ? `${task.project.name} (TaskId ${task.id} ${
+                        tu ? `/ TuId ${tu.tuId}` : null
+                      })`
+                    : null}
+                </Text>
+              </Col>
+              {tu && tu.tuvs && isComplete(tu.tuvs) && (
+                <Col xs={24} md={6} style={{ margin: "5px 0", float: "right" }}>
+                  <Alert message="This item has been modified" type="success" />
+                </Col>
+              )}
+              {console.log(tu)}
+            </Row>
           </Col>
           <Col xs={24} md={12}>
             <Link className="right" to="/evaluator">

@@ -16,11 +16,21 @@ const TabErrors = ({
   setTerminology,
   setStyle,
   setLocaleConvention,
+  translation,
+  setTranslation,
   onChange,
+  onChangeV4,
 }) => {
   return (
     <Tabs defaultActiveKey="1">
-      <TabPane tab="Accuracy" key="accuracy">
+      <TabPane
+        tab={
+          <span className={accuracy.value !== "0" ? "red-tab" : ""}>
+            Accuracy
+          </span>
+        }
+        key="accuracy"
+      >
         <Errors
           error={accuracy}
           setError={setAccuracy}
@@ -48,15 +58,15 @@ const TabErrors = ({
             </Col>
             <Col xs={24} md={16}>
               <div style={{ marginTop: 20 }}>
+                <h4>Translation proposal</h4>
                 <TextArea
                   placeholder="Enter the correct translation"
                   autoSize
                   rows={4}
-                  value={accuracy.text}
+                  value={translation}
                   onChange={({ target: { value } }) => {
-                    accuracy.text = value;
-                    setAccuracy({ ...accuracy });
-                    onChange("accuracy", accuracy);
+                    setTranslation(value);
+                    onChangeV4(value);
                   }}
                 />
               </div>
@@ -64,7 +74,14 @@ const TabErrors = ({
           </Row>
         )}
       </TabPane>
-      <TabPane tab="Fluency" key="fluency">
+      <TabPane
+        tab={
+          <span className={fluency.value !== "0" ? "red-tab" : ""}>
+            Fluency
+          </span>
+        }
+        key="fluency"
+      >
         <Errors
           error={fluency}
           setError={setFluency}
@@ -91,15 +108,15 @@ const TabErrors = ({
             </Col>
             <Col xs={24} md={16}>
               <div style={{ marginTop: 20 }}>
+                <h4>Translation proposal</h4>
                 <TextArea
                   placeholder="Enter the correct translation"
                   autoSize
                   rows={4}
-                  value={fluency.text}
+                  value={translation}
                   onChange={({ target: { value } }) => {
-                    fluency.text = value;
-                    setFluency({ ...fluency });
-                    onChange("fluency", fluency);
+                    setTranslation(value);
+                    onChangeV4(value);
                   }}
                 />
               </div>
@@ -107,7 +124,14 @@ const TabErrors = ({
           </Row>
         )}
       </TabPane>
-      <TabPane tab="Terminology" key="terminology">
+      <TabPane
+        tab={
+          <span className={terminology.value !== "0" ? "red-tab" : ""}>
+            Terminology
+          </span>
+        }
+        key="terminology"
+      >
         <Errors
           error={terminology}
           setError={setTerminology}
@@ -119,15 +143,15 @@ const TabErrors = ({
           <Row>
             <Col xs={24} md={16}>
               <div style={{ marginTop: 20 }}>
+                <h4>Translation proposal</h4>
                 <TextArea
                   placeholder="Enter the correct translation"
                   autoSize
                   rows={4}
-                  value={terminology.text}
+                  value={translation}
                   onChange={({ target: { value } }) => {
-                    terminology.text = value;
-                    setTerminology({ ...terminology });
-                    onChange("terminology", terminology);
+                    setTranslation(value);
+                    onChangeV4(value);
                   }}
                 />
               </div>
@@ -135,7 +159,12 @@ const TabErrors = ({
           </Row>
         )}
       </TabPane>
-      <TabPane tab="Style" key="style">
+      <TabPane
+        tab={
+          <span className={style.value !== "0" ? "red-tab" : ""}>Style</span>
+        }
+        key="style"
+      >
         <Errors
           error={style}
           setError={setStyle}
@@ -147,15 +176,15 @@ const TabErrors = ({
           <Row>
             <Col xs={24} md={16}>
               <div style={{ marginTop: 20 }}>
+                <h4>Translation proposal</h4>
                 <TextArea
                   placeholder="Enter the correct translation"
                   autoSize
                   rows={4}
-                  value={style.text}
+                  value={translation}
                   onChange={({ target: { value } }) => {
-                    style.text = value;
-                    setStyle({ ...style });
-                    onChange("style", style);
+                    setTranslation(value);
+                    onChangeV4(value);
                   }}
                 />
               </div>
@@ -163,7 +192,14 @@ const TabErrors = ({
           </Row>
         )}
       </TabPane>
-      <TabPane tab="Locale_Convention" key="locale_Convention">
+      <TabPane
+        tab={
+          <span className={localeConvention.value !== "0" ? "red-tab" : ""}>
+            Locale_Convention
+          </span>
+        }
+        key="locale_Convention"
+      >
         <Errors
           error={localeConvention}
           setError={setLocaleConvention}
@@ -175,15 +211,15 @@ const TabErrors = ({
           <Row>
             <Col xs={24} md={16}>
               <div style={{ marginTop: 20 }}>
+                <h4>Translation proposal</h4>
                 <TextArea
                   placeholder="Enter the correct translation"
                   autoSize
                   rows={4}
-                  value={localeConvention.text}
+                  value={translation}
                   onChange={({ target: { value } }) => {
-                    localeConvention.text = value;
-                    setLocaleConvention({ ...localeConvention });
-                    onChange("localeConvention", localeConvention);
+                    setTranslation(value);
+                    onChangeV4(value);
                   }}
                 />
               </div>

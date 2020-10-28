@@ -93,11 +93,15 @@ const ProjectsList = ({
     filterIcon: (filtered) => (
       <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
     ),
-    onFilter: (value, record) =>
-      record[dataIndex]
-        .toString()
-        .toLowerCase()
-        .includes(value.toLowerCase()),
+    onFilter: (value, record) => {
+      if (record[dataIndex]) {
+        return record[dataIndex]
+          .toString()
+          .toLowerCase()
+          .includes(value.toLowerCase());
+      }
+      return false;
+    },
     onFilterDropdownVisibleChange: (visible) => {
       if (visible) {
         setTimeout(() => {
@@ -130,6 +134,15 @@ const ProjectsList = ({
   };
 
   const model = [
+    {
+      title: "Id",
+      dataIndex: "id",
+      key: "id",
+      sorter: (a, b) => parseInt(a.id) - parseInt(b.id),
+      ...getColumnSearchProps("id"),
+      // eslint-disable-next-line jsx-a11y/anchor-is-valid
+      render: (text) => <a>{text}</a>,
+    },
     {
       title: "Name",
       dataIndex: "name",
