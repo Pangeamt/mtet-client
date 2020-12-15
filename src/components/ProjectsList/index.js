@@ -7,7 +7,7 @@ import {
   Tooltip,
   Progress,
   Dropdown,
-  Menu
+  Menu,
 } from "antd";
 import numeral from "numeral";
 import styled from "styled-components";
@@ -26,7 +26,7 @@ const ProjectsList = ({
   select,
   selectClone,
   showsTuvs,
-  showsTasks
+  showsTasks,
 }) => {
   const model = [
     {
@@ -34,33 +34,33 @@ const ProjectsList = ({
       dataIndex: "name",
       key: "name",
       // eslint-disable-next-line jsx-a11y/anchor-is-valid
-      render: text => <a>{text}</a>
+      render: (text) => <a>{text}</a>,
     },
     {
       title: "Source",
       dataIndex: "source",
-      key: "source"
+      key: "source",
     },
     {
       title: "Target",
       dataIndex: "target",
-      key: "target"
+      key: "target",
     },
     {
       title: "Type",
       dataIndex: "type",
-      key: "type"
+      key: "type",
     },
     {
       title: "#Tus",
       dataIndex: "tus",
-      key: "tus"
+      key: "tus",
     },
-    {
-      title: "#Tuvs",
-      dataIndex: "tuvs",
-      key: "tuvs"
-    },
+    // {
+    //   title: "#Tuvs",
+    //   dataIndex: "tuvs",
+    //   key: "tuvs",
+    // },
     {
       title: "Complete %",
       key: "complete",
@@ -72,7 +72,7 @@ const ProjectsList = ({
             )}
           />
         );
-      }
+      },
     },
 
     {
@@ -92,7 +92,7 @@ const ProjectsList = ({
                 style={{
                   width: 15,
                   height: 15,
-                  margin: "-4px 0px 0 0px"
+                  margin: "-4px 0px 0 0px",
                 }}
                 src={TASKS}
                 alt=""
@@ -111,7 +111,7 @@ const ProjectsList = ({
                   style={{
                     width: 15,
                     height: 15,
-                    margin: "-4px 0px 0 0px"
+                    margin: "-4px 0px 0 0px",
                   }}
                   src={TUVS}
                   alt=""
@@ -171,8 +171,8 @@ const ProjectsList = ({
             </Tooltip>
           </React.Fragment>
         );
-      }
-    }
+      },
+    },
   ];
 
   return (
@@ -181,6 +181,7 @@ const ProjectsList = ({
       columns={model}
       dataSource={projects}
       size="small"
+      rowKey={(el) => el.id}
     />
   );
 };

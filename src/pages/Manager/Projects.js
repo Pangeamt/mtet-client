@@ -40,7 +40,7 @@ const Projects = () => {
     try {
       if (load) setLoading(true);
       const { data } = await getProjects();
-      setProjects(data);
+      setProjects(data.docs || []);
       setLoading(false);
       setVisible(false);
     } catch (error) {

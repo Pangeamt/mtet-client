@@ -47,7 +47,7 @@ const ProjectFormCmp = ({
     if (project) {
       setSegments(project.segments || 0);
     }
-  }, []);
+  }, [project, project.id]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
