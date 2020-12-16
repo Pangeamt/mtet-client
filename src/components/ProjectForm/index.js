@@ -48,6 +48,7 @@ const ProjectFormCmp = ({
     if (project) {
       setSegments(project.segments || 0);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSubmit = (e) => {

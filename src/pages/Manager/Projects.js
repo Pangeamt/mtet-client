@@ -10,7 +10,6 @@ import {
   Card,
   Layout,
   Typography,
-  Space,
 } from "antd";
 
 import ProjectsList from "./../../components/ProjectsList";
@@ -55,6 +54,7 @@ const Projects = () => {
 
   useEffect(() => {
     fetch(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetch = async (params = {}) => {
