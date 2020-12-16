@@ -1,7 +1,9 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from "react";
 
-import { Menu, Icon } from "antd";
+import { LogoutOutlined, QuestionCircleOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+
+import { Menu } from "antd";
 
 import styled from "styled-components";
 
@@ -44,19 +46,19 @@ const avatarDropdown = ({ user, logout }) => {
       <Menu.Item key="0">
         {" "}
         <a href="#">
-          <Icon type="user" />
+          <UserOutlined />
           Profile
         </a>{" "}
       </Menu.Item>
       <Menu.Item key="1" disabled>
         {" "}
-        <Icon type="setting" />
+        <SettingOutlined />
         Settings{" "}
       </Menu.Item>
       <Menu.Item key="2">
         {" "}
         <a href="#">
-          <Icon type="question-circle-o" />
+          <QuestionCircleOutlined />
           Need Help?
         </a>{" "}
       </Menu.Item>
@@ -64,7 +66,7 @@ const avatarDropdown = ({ user, logout }) => {
       <Menu.Item key="3" onClick={logout}>
         <span>
           {" "}
-          <Icon type="logout" />
+          <LogoutOutlined />
           Sign out
         </span>
       </Menu.Item>

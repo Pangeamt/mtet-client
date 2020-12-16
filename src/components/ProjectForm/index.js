@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { QuestionCircleOutlined, UploadOutlined } from "@ant-design/icons";
+import { Form } from "@ant-design/compatible";
+import "@ant-design/compatible/assets/index.css";
 import {
-  Form,
   Input,
   Upload,
-  Icon,
   Button,
   Select,
   message,
@@ -47,7 +48,9 @@ const ProjectFormCmp = ({
     if (project) {
       setSegments(project.segments || 0);
     }
-  }, [project, project.id]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -299,6 +302,9 @@ const ProjectFormCmp = ({
             <Select.Option value="zero-to-one-hundred">
               Zero to one hundred
             </Select.Option>
+            <Select.Option value="fluency">Fluency</Select.Option>{" "}
+            <Select.Option value="accuracy">Accuracy</Select.Option>
+            <Select.Option value="mqm">MQM</Select.Option>
           </Select>
         )}
       </Form.Item>
@@ -308,7 +314,7 @@ const ProjectFormCmp = ({
           <span>
             Segments&nbsp;
             <Tooltip title="Segments before and after display (Context)">
-              <Icon type="question-circle-o" />
+              <QuestionCircleOutlined />
             </Tooltip>
           </span>
         }
@@ -350,7 +356,7 @@ const ProjectFormCmp = ({
             <Form.Item {...tailFormItemLayout}>
               <Upload {...props}>
                 <Button disabled={fileList.length}>
-                  <Icon type="upload" /> Select Tmx File
+                  <UploadOutlined /> Select Tmx File
                 </Button>
               </Upload>
             </Form.Item>
@@ -369,69 +375,72 @@ const ProjectFormCmp = ({
                 </Col>
               </Row>
               <Row>
-                <Col>
-                  <Form.Item {...tailFormItemLayout}>
-                    <Row>
-                      <Col span={10}>
+                <Col xs={24} sm={8}></Col>
+                <Col xs={24} sm={16}>
+                  <Row gutter={[16, 16]}>
+                    <Col span={10}>
+                      <Form.Item>
                         <Upload {...propsSrc}>
                           <Button disabled={fileSrc.length}>
-                            <Icon type="upload" /> Select Sources File
+                            <UploadOutlined /> Select Sources File
                           </Button>
                         </Upload>
-                      </Col>
-                      <Col span={14}>
-                        <Alert
-                          message={<span>"sources.en.txt"</span>}
-                          type="info"
-                          showIcon
-                        />
-                      </Col>
-                    </Row>
-                  </Form.Item>
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Alert
+                        message={<span>"sources.en.txt"</span>}
+                        type="info"
+                        showIcon
+                      />
+                    </Col>
+                  </Row>
                 </Col>
               </Row>
               <Row>
-                <Col>
-                  <Form.Item {...tailFormItemLayout}>
-                    <Row>
-                      <Col span={10}>
+                <Col xs={24} sm={8}></Col>
+                <Col xs={24} sm={16}>
+                  <Row gutter={[16, 16]}>
+                    <Col span={10}>
+                      <Form.Item>
                         <Upload {...propsRef}>
                           <Button disabled={fileRef.length}>
-                            <Icon type="upload" /> Select References File
+                            <UploadOutlined /> Select References File
                           </Button>
                         </Upload>
-                      </Col>
-                      <Col span={14}>
-                        <Alert
-                          message={<span>"references.en.txt"</span>}
-                          type="info"
-                          showIcon
-                        />
-                      </Col>
-                    </Row>
-                  </Form.Item>
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Alert
+                        message={<span>"references.en.txt"</span>}
+                        type="info"
+                        showIcon
+                      />
+                    </Col>
+                  </Row>
                 </Col>
               </Row>
               <Row>
-                <Col>
-                  <Form.Item {...tailFormItemLayout}>
-                    <Row>
-                      <Col span={10}>
+                <Col xs={24} sm={8}></Col>
+                <Col xs={24} sm={16}>
+                  <Row gutter={[16, 16]}>
+                    <Col span={10}>
+                      <Form.Item>
                         <Upload {...propsTgt}>
                           <Button>
-                            <Icon type="upload" /> Select Target Files
+                            <UploadOutlined /> Select Target Files
                           </Button>
                         </Upload>
-                      </Col>
-                      <Col span={14}>
-                        <Alert
-                          message={<span>"Google.en.txt"</span>}
-                          type="info"
-                          showIcon
-                        />
-                      </Col>
-                    </Row>
-                  </Form.Item>
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Alert
+                        message={<span>"Google.en.txt"</span>}
+                        type="info"
+                        showIcon
+                      />
+                    </Col>
+                  </Row>
                 </Col>
               </Row>
             </React.Fragment>

@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Card } from "antd";
+import { Card, Layout, Row, Col } from "antd";
 import styled from "styled-components";
 import { navigate } from "@reach/router";
 import { reactLocalStorage } from "reactjs-localstorage";
@@ -8,9 +8,11 @@ import { AppContext } from "./../AppContext";
 import LoginForm from "./../components/LoginForm";
 import { handleError, login } from "./../services";
 
+const { Content } = Layout;
+
 const CardLogin = styled(Card)`
   width: 100%;
-  margin-top: 150px;
+  margin: 130px 0 0 0;
 `;
 const Login = () => {
   const { setUser, setToken, user, token } = useContext(AppContext);
@@ -23,7 +25,7 @@ const Login = () => {
     }
   }, [token, user]);
 
-  const redirect = user => {
+  const redirect = (user) => {
     if (user.role === "admin") {
       return navigate(`/admin`);
     }
@@ -35,11 +37,11 @@ const Login = () => {
     }
   };
 
-  const _login = async form => {
+  const _login = async (form) => {
     try {
       setLoading(true);
       const {
-        data: { token, user }
+        data: { token, user },
       } = await login(form);
 
       if (token && user) {
@@ -57,15 +59,15 @@ const Login = () => {
   };
 
   return (
-    <div className="container">
-      <div className="row justify-content-center align-items-center">
-        <div className="col-12 col-sm-10 col-md-8 col-lg-5">
+    <Content>
+      <Row type="flex" justify="center">
+        <Col xs={22} md={10} lg={6}>
           <CardLogin>
             <LoginForm loading={loading} login={_login} />
           </CardLogin>
-        </div>
-      </div>
-    </div>
+        </Col>
+      </Row>
+    </Content>
   );
 };
 

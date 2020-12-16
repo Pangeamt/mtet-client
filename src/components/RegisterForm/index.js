@@ -1,5 +1,8 @@
 import React from "react";
-import { Form, Input, Tooltip, Icon, Checkbox, Button, Divider } from "antd";
+import { QuestionCircleOutlined } from '@ant-design/icons';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Input, Tooltip, Checkbox, Button, Divider } from "antd";
 import { Link } from "@reach/router";
 const FormItem = Form.Item;
 
@@ -73,7 +76,7 @@ class RegistrationForm extends React.Component {
               <span>
                 Nickname&nbsp;
                 <Tooltip title="What do you want other to call you?">
-                  <Icon type="question-circle-o" />
+                  <QuestionCircleOutlined />
                 </Tooltip>
               </span>
             }

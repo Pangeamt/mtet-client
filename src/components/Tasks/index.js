@@ -1,4 +1,16 @@
 import React, { useEffect, useState } from "react";
+
+import {
+  DeleteOutlined,
+  EyeInvisibleTwoTone,
+  EyeTwoTone,
+  MailOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+
+import { Icon as LegacyIcon } from "@ant-design/compatible";
 import {
   Row,
   Col,
@@ -6,15 +18,14 @@ import {
   message,
   Modal,
   Button,
-  List,
   Typography,
   Progress,
-  Icon,
   Card,
   Tooltip,
-  Popconfirm
+  Popconfirm,
 } from "antd";
 import numeral from "numeral";
+import styled from "styled-components";
 
 import TaskForm from "./../TaskForm";
 import {
@@ -25,16 +36,21 @@ import {
   addTask,
   assignTask,
   restartTask,
-  activeTask
+  activeTask,
 } from "./../../services";
 
 import "./style.css";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
+
+const ButtonActions = styled(Button)`
+  margin-right: 10px;
+  margin-left: 10px;
+`;
 
 const Tasks = ({ project }) => {
-  const tuvs = project.projects || [];
-
+  const tuvs = project.tuvs || [];
+  const [pagination, setPagination] = useState({});
   const [visible, setVisible] = useState(false);
   const [visibleForm, setVisibleForm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -49,7 +65,7 @@ const Tasks = ({ project }) => {
     fetchEvaluators();
     fetch();
     const obj = {};
-    tuvs.forEach(element => {
+    tuvs.forEach((element) => {
       if (obj[element.tuId]) {
         obj[element.tuId].push(element.id);
       } else {
@@ -70,20 +86,43 @@ const Tasks = ({ project }) => {
     }
   };
 
-  const fetch = async () => {
+  const fetch = async (params = {}) => {
     try {
       setLoading(true);
-      const { data } = await getTasks(project.id);
-      setTasks(data);
+      params["project"] = project.id;
+      const {
+        data: { docs, total },
+      } = await getTasks(params);
+      const pag = { ...pagination };
+      pag.total = total;
+
+      setTasks(docs);
       setLoadingActive(false);
       setLoading(false);
+      setPagination(pag);
     } catch (error) {
       handleError(error);
-      setLoading(true);
+      setLoading(false);
     }
   };
 
-  const remove = async record => {
+  const handleTableChange = (pag, filters, sorter) => {
+    const pager = {
+      ...pagination,
+    };
+    pager.current = pag.current;
+    setPagination(pager);
+
+    fetch({
+      results: pag.pageSize,
+      page: pag.current,
+      sortField: sorter.field,
+      sortOrder: sorter.order,
+      ...filters,
+    });
+  };
+
+  const remove = async (record) => {
     try {
       setLoadingActive(`load-${record.id}`);
       await removeTask(record.id);
@@ -95,10 +134,10 @@ const Tasks = ({ project }) => {
     }
   };
 
-  const handleCancel = e => {
+  const handleCancel = (e) => {
     setVisible(false);
   };
-  const handleFormCancel = e => {
+  const handleFormCancel = (e) => {
     setVisibleForm(false);
   };
 
@@ -108,13 +147,13 @@ const Tasks = ({ project }) => {
       overlappingTuvs,
       percentageEvaluationsRandomlyRepeated,
       showSourceText,
-      showReferenceText
+      showReferenceText,
     } = values;
 
     const nTus = Object.keys(tus).length;
     const txe = parseInt(nTus / numberTasks) + 1;
     const copyTus = [];
-    Object.keys(tus).forEach(item => {
+    Object.keys(tus).forEach((item) => {
       copyTus.push(tus[item]);
     });
 
@@ -124,7 +163,7 @@ const Tasks = ({ project }) => {
         tus: [],
         tuvs: 0,
         showSourceText,
-        showReferenceText
+        showReferenceText,
       };
 
       for (let j = 0; j < txe; j++) {
@@ -151,14 +190,14 @@ const Tasks = ({ project }) => {
             });
           }
         }
-        aux.forEach(item => {
+        aux.forEach((item) => {
           newTasks[i].tus.push(item);
           newTasks[i].tuvs += item.length;
         });
       }
     }
     if (percentageEvaluationsRandomlyRepeated) {
-      newTasks.forEach(element => {
+      newTasks.forEach((element) => {
         let aux = element.tus;
         const ntr = parseInt(
           (element.tus.length * percentageEvaluationsRandomlyRepeated) / 100
@@ -189,7 +228,7 @@ const Tasks = ({ project }) => {
     }
   };
 
-  const assign = async evaluator => {
+  const assign = async (evaluator) => {
     try {
       setLoadingActive(`assign-${evaluator}`);
       await assignTask(evaluator, selectedTask.id);
@@ -203,7 +242,7 @@ const Tasks = ({ project }) => {
     }
   };
 
-  const restart = async task => {
+  const restart = async (task) => {
     try {
       setLoadingActive(`restart-${task}`);
       await restartTask(task);
@@ -217,7 +256,7 @@ const Tasks = ({ project }) => {
     }
   };
 
-  const active = async task => {
+  const active = async (task) => {
     try {
       setLoadingActive(`active-${task}`);
       await activeTask(task);
@@ -231,7 +270,7 @@ const Tasks = ({ project }) => {
     }
   };
 
-  const showModal = selected => {
+  const showModal = (selected) => {
     setSelectedTask(selected);
     setVisible(true);
   };
@@ -240,7 +279,7 @@ const Tasks = ({ project }) => {
     {
       title: "Id",
       key: "id",
-      dataIndex: "id"
+      dataIndex: "id",
     },
     {
       title: "Evaluator",
@@ -252,17 +291,17 @@ const Tasks = ({ project }) => {
               <Col xs={20}>
                 {`${record.user.nickname.toUpperCase()}`}
                 <br />
-                <Icon type="mail" /> {record.user.email}
+                <MailOutlined /> {record.user.email}
               </Col>
               <Col xs={4}>
                 <Button
                   style={{
-                    marginTop: 10
+                    marginTop: 10,
                   }}
                   onClick={() => {
                     showModal(record);
                   }}
-                  icon="user"
+                  icon={<UserOutlined />}
                   size="small"
                 ></Button>
               </Col>
@@ -272,7 +311,7 @@ const Tasks = ({ project }) => {
           return (
             <Button
               className="assign-e"
-              icon="plus"
+              icon={<PlusOutlined />}
               onClick={() => {
                 showModal(record);
               }}
@@ -282,7 +321,7 @@ const Tasks = ({ project }) => {
             </Button>
           );
         }
-      }
+      },
     },
     {
       title: "Source/Reference",
@@ -293,27 +332,19 @@ const Tasks = ({ project }) => {
           <div>
             &nbsp;&nbsp;
             {record.showReferenceText ? (
-              <Icon type="eye" theme="twoTone" twoToneColor="#52c41a" />
+              <EyeTwoTone twoToneColor="#52c41a" />
             ) : (
-              <Icon
-                type="eye-invisible"
-                theme="twoTone"
-                twoToneColor="#eb2f96"
-              />
+              <EyeInvisibleTwoTone twoToneColor="#eb2f96" />
             )}
             &nbsp;/&nbsp;
             {text ? (
-              <Icon type="eye" theme="twoTone" twoToneColor="#52c41a" />
+              <EyeTwoTone twoToneColor="#52c41a" />
             ) : (
-              <Icon
-                type="eye-invisible"
-                theme="twoTone"
-                twoToneColor="#eb2f96"
-              />
+              <EyeInvisibleTwoTone twoToneColor="#eb2f96" />
             )}
           </div>
         );
-      }
+      },
     },
 
     {
@@ -329,61 +360,59 @@ const Tasks = ({ project }) => {
             />
           </span>
         );
-      }
+      },
     },
     {
       title: "",
       key: "restart",
-      width: 120,
+      width: 150,
       render: (text, record) => {
         return (
           <React.Fragment>
-            {!record.active && (
-              <Popconfirm
-                onConfirm={() => {
-                  remove(record);
-                }}
-                title="Are you sure？"
-                okText="Yes"
-                cancelText="No"
-              >
-                <Button
-                  className="ml-2 right"
-                  loading={loadingActive === `load-${record.id}`}
-                  icon="delete"
-                  type="danger"
-                  size="small"
-                ></Button>
-              </Popconfirm>
-            )}
-
             <Tooltip placement="top" title="Restart Task">
-              <Button
-                className="ml-2 right"
+              <ButtonActions
                 loading={loadingActive === `restart-${record.id}`}
                 onClick={() => {
                   restart(record.id);
                 }}
                 size="small"
-                icon="reload"
-              ></Button>
+                icon={<ReloadOutlined />}
+              ></ButtonActions>
             </Tooltip>
+
             <Tooltip placement="top" title="Activate/Deactivate Task">
-              <Button
-                className="right"
+              <ButtonActions
                 loading={loadingActive === `active-${record.id}`}
                 onClick={() => {
                   active(record.id);
                 }}
                 size="small"
                 type={record.active ? "primary" : "danger"}
-                icon={record.active ? "check" : "close"}
-              ></Button>
+                icon={<LegacyIcon type={record.active ? "check" : "close"} />}
+              ></ButtonActions>
             </Tooltip>
+
+            {!record.active && (
+              <Popconfirm
+                onConfirm={() => {
+                  remove(record);
+                }}
+                title="Are you sure?"
+                okText="Yes"
+                cancelText="No"
+              >
+                <ButtonActions
+                  loading={loadingActive === `load-${record.id}`}
+                  icon={<DeleteOutlined />}
+                  type="danger"
+                  size="small"
+                ></ButtonActions>
+              </Popconfirm>
+            )}
           </React.Fragment>
         );
-      }
-    }
+      },
+    },
   ];
 
   const e_columns = [
@@ -391,14 +420,14 @@ const Tasks = ({ project }) => {
       title: "Nickname",
       dataIndex: "nickname",
       key: "nickname",
-      render: text => {
+      render: (text) => {
         return <span className="text-capitalize">{text}</span>;
-      }
+      },
     },
     {
       title: "Email",
       dataIndex: "email",
-      key: "email"
+      key: "email",
     },
     {
       title: "",
@@ -419,12 +448,12 @@ const Tasks = ({ project }) => {
             Select
           </Button>
         );
-      }
-    }
+      },
+    },
   ];
   return (
     <Row>
-      <Col xs={24} className="p-2">
+      <Col xs={24}>
         <Button
           disabled={loading}
           style={{ float: "right", position: "relative", zIndex: 100 }}
@@ -442,6 +471,9 @@ const Tasks = ({ project }) => {
           size="small"
           dataSource={tasks}
           columns={t_columns}
+          onChange={handleTableChange}
+          pagination={pagination}
+          rowKey={(record) => record.id}
         />
       </Col>
 
@@ -467,7 +499,7 @@ const Tasks = ({ project }) => {
         onCancel={handleFormCancel}
       >
         <Row>
-          <Col xs={24} className="p-2">
+          <Col xs={24}>
             <Row>
               {collectionsTasks.length === 0 && (
                 <Col xs={24}>
@@ -480,44 +512,42 @@ const Tasks = ({ project }) => {
               )}
 
               {collectionsTasks.length > 0 && (
-                <Col xs={24} className="p-2">
+                <Col xs={24}>
                   <Row
                     style={{
                       backgroundColor: "#f0f0ff",
-                      padding: "5px 10px"
+                      padding: "5px 10px",
                     }}
                   >
-                    <Col>
-                      <Card>
-                        <List
-                          size="small"
-                          header={<Title level={4}>New Tasks</Title>}
-                          bordered
-                          dataSource={collectionsTasks}
-                          renderItem={(item, i) => (
-                            <List.Item>
-                              <Row
-                                type="flex"
-                                justify="space-between"
-                                className="w-100"
-                              >
-                                <Col xs={4}>{i + 1}</Col>
-                                <Col xs={10}>
-                                  #Tus: <Text underline>{item.tus.length}</Text>
-                                </Col>
-                                <Col xs={10}>
-                                  #Tuvs: <Text underline>{item.tuvs}</Text>
-                                </Col>
-                              </Row>
-                            </List.Item>
-                          )}
-                        />
-                      </Card>
+                    <Col span={24}>
+                      <Row gutter={[5, 5]} className="w-100">
+                        {collectionsTasks.map((item, i) => {
+                          return (
+                            <Col span={6}>
+                              <Card style={{ padding: "10px 16px" }}>
+                                <Row
+                                  type="flex"
+                                  justify="space-between"
+                                  className="w-100"
+                                >
+                                  <Col xs={24}>{i + 1}</Col>
+                                  <Col xs={24}>
+                                    #Tus:{" "}
+                                    <Text underline>{item.tus.length}</Text>
+                                  </Col>
+                                  <Col xs={24}>
+                                    #Tuvs: <Text underline>{item.tuvs}</Text>
+                                  </Col>
+                                </Row>
+                              </Card>
+                            </Col>
+                          );
+                        })}
+                      </Row>
                     </Col>
-                    <Col className="my-5">
+                    <Col xs={24}>
                       <Button
-                        className="ml-2"
-                        style={{ float: "right" }}
+                        style={{ float: "right", marginLeft: 10 }}
                         type="primary"
                         loading={loading}
                         onClick={create}

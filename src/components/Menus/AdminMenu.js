@@ -1,5 +1,6 @@
 import React from "react";
-import { Menu, Icon } from "antd";
+import { DashboardOutlined, TeamOutlined } from '@ant-design/icons';
+import { Menu } from "antd";
 import { Link, Location } from "@reach/router";
 
 const AdminMenu = props => {
@@ -14,13 +15,13 @@ const AdminMenu = props => {
           >
             <Menu.Item key="/admin">
               <Link to="/admin">
-                <Icon type="dashboard" />
+                <DashboardOutlined />
                 <span>Dashboard</span>
               </Link>
             </Menu.Item>
             <Menu.Item key="/admin/users">
               <Link to="users">
-                <Icon type="team" />
+                <TeamOutlined />
                 <span>Users</span>
               </Link>
             </Menu.Item>

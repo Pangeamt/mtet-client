@@ -1,5 +1,16 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Row, Col, Tabs, Button, Modal, message, Card } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import {
+  Row,
+  Col,
+  Tabs,
+  Button,
+  Modal,
+  message,
+  Card,
+  Layout,
+  Typography,
+} from "antd";
 
 import ProjectsList from "./../../components/ProjectsList";
 import ProjectForm from "./../../components/ProjectForm";
@@ -19,12 +30,21 @@ import {
 
 import { AppContext } from "./../../AppContext";
 import IMAGE from "./../../assets/pm.png";
+import styled from "styled-components";
 
+const { Content } = Layout;
+const { Title, Text } = Typography;
 const { TabPane } = Tabs;
+
+const TextSub = styled(Text)`
+  font-size: 1.1875rem;
+  font-weight: 300;
+`;
 
 const Projects = () => {
   const { user } = useContext(AppContext);
 
+  const [pagination, setPagination] = useState({});
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
   const [projects, setProjects] = useState([]);
@@ -34,19 +54,42 @@ const Projects = () => {
 
   useEffect(() => {
     fetch(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fetch = async (load = false) => {
+  const fetch = async (params = {}) => {
     try {
-      if (load) setLoading(true);
-      const { data } = await getProjects();
-      setProjects(data.docs || []);
-      setLoading(false);
+      setLoading(true);
+      const {
+        data: { docs, total },
+      } = await getProjects(params);
+      const pag = { ...pagination };
+      pag.total = total;
+
+      setProjects(docs);
       setVisible(false);
+      setLoading(false);
+      setPagination(pag);
     } catch (error) {
       handleError(error);
       setLoading(false);
     }
+  };
+
+  const handleTableChange = (pag, filters, sorter) => {
+    const pager = {
+      ...pagination,
+    };
+    pager.current = pag.current;
+    setPagination(pager);
+
+    fetch({
+      results: pag.pageSize,
+      page: pag.current,
+      sortField: sorter.field,
+      sortOrder: sorter.order,
+      ...filters,
+    });
   };
 
   const add = async (values, form, { setFileList }) => {
@@ -204,7 +247,7 @@ const Projects = () => {
         setVisible(true);
       }}
       type="primary"
-      icon="plus"
+      icon={<PlusOutlined />}
     >
       Add Project
     </Button>
@@ -219,67 +262,66 @@ const Projects = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <article className="article">
-        <Row>
-          <Col>
-            <div class="img-card__body img-card__body--left">
-              <h2 class="img-card__title text-capitalize">
-                Hello {user.nickname}!
-              </h2>
-              <p class="img-card__desc lead">
-                Here you can manage project, assign tasks and keep track of the
-                status of each of these tasks.
-              </p>
-            </div>
-          </Col>
-        </Row>
-        <Row>
-          <Col xs={24} md={6} className="p-2">
-            <article className="img-card-v1 mb-4" style={{ height: "340px" }}>
-              <div
-                className="img-card__cover"
-                style={{
-                  backgroundImage: `url('${IMAGE}')`,
-                }}
-              ></div>
-            </article>
-          </Col>
-          <Col xs={24} md={18} className="p-2">
-            <Card style={{ minHeight: 340 }}>
-              <Tabs
-                activeKey={tab}
-                tabBarExtraContent={
-                  mode !== "tuvs" && mode !== "tasks" ? operations : null
-                }
-                onChange={callback}
-              >
-                <TabPane tab="Projects" key="projects">
-                  <ProjectsList
-                    projects={projects}
-                    loading={loading}
-                    select={selectProject}
-                    selectClone={selectClone}
-                    remove={remove}
-                    showsTuvs={showsTuvs}
-                    showsTasks={showsTasks}
-                  />
+    <Content style={{ padding: 50 }}>
+      <Row style={{ marginBottom: 20 }} type="flex" justify="center">
+        <Col xs={24}>
+          <Title style={{ marginBottom: 0 }} level={2}>
+            {" "}
+            Hello {user.nickname}!
+          </Title>
+          <TextSub>
+            Here you can manage projects, assign tasks and keep track of the
+            status of each of these tasks.
+          </TextSub>
+        </Col>
+      </Row>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} md={6}>
+          <Card className="img-card-v1" style={{ height: "340px" }}>
+            <div
+              className="img-card__cover"
+              style={{
+                backgroundImage: `url('${IMAGE}')`,
+              }}
+            ></div>
+          </Card>
+        </Col>
+        <Col xs={24} md={18}>
+          <Card style={{ minHeight: 340, padding: 20 }}>
+            <Tabs
+              activeKey={tab}
+              tabBarExtraContent={
+                mode !== "tuvs" && mode !== "tasks" ? operations : null
+              }
+              onChange={callback}
+            >
+              <TabPane tab="Projects" key="projects">
+                <ProjectsList
+                  pagination={pagination}
+                  handleTableChange={handleTableChange}
+                  projects={projects}
+                  loading={loading}
+                  select={selectProject}
+                  selectClone={selectClone}
+                  remove={remove}
+                  showsTuvs={showsTuvs}
+                  showsTasks={showsTasks}
+                />
+              </TabPane>
+              {mode === "tuvs" && project && project.tuvs.length && (
+                <TabPane tab={`Tuvs (${project.name})`} key="tuvs">
+                  <TuvsManager tuvs={project.tuvs} />
                 </TabPane>
-                {mode === "tuvs" && project && project.projects.length && (
-                  <TabPane tab={`Tuvs (${project.name})`} key="tuvs">
-                    <TuvsManager tuvs={project.projects} />
-                  </TabPane>
-                )}
-                {mode === "tasks" && project && (
-                  <TabPane tab={`Tasks (${project.name})`} key="tasks">
-                    <Tasks project={project} />
-                  </TabPane>
-                )}
-              </Tabs>
-            </Card>
-          </Col>
-        </Row>
-      </article>
+              )}
+              {mode === "tasks" && project && (
+                <TabPane tab={`Tasks (${project.name})`} key="tasks">
+                  <Tasks project={project} />
+                </TabPane>
+              )}
+            </Tabs>
+          </Card>
+        </Col>
+      </Row>
       <Modal
         maskClosable={false}
         width={800}
@@ -302,7 +344,7 @@ const Projects = () => {
           <ProjectCloneForm loading={loading} clone={clone} />
         )}
       </Modal>
-    </div>
+    </Content>
   );
 };
 

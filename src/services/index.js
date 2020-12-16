@@ -4,24 +4,24 @@ import { navigate } from "@reach/router";
 import { reactLocalStorage } from "reactjs-localstorage";
 import { HOST_API } from "./../config";
 
-export const handleError = error => {
+export const handleError = (error) => {
   if (error && error.response && error.response.status === 401) {
     return navigate(`/logout`);
   }
-  if (error.response.data.message) {
+  if (error && error.response && error.response.data.message) {
     return message.error(error.response.data.message);
   }
 
   return message.error(error.message);
 };
 
-export const login = form => {
+export const login = (form) => {
   const token = reactLocalStorage.get("token", false);
   axios.defaults.headers.common["x-access-token"] = token;
   return axios({
     method: "post",
     url: `${HOST_API}/v1/auth/login`,
-    data: form
+    data: form,
   });
 };
 
@@ -31,13 +31,13 @@ export const getUsers = () => {
   return axios.get(`${HOST_API}/v1/users`);
 };
 
-export const addUser = values => {
+export const addUser = (values) => {
   const token = reactLocalStorage.get("token", false);
   axios.defaults.headers.common["x-access-token"] = token;
   return axios({
     method: "post",
     url: `${HOST_API}/v1/users`,
-    data: values
+    data: values,
   });
 };
 
@@ -47,23 +47,34 @@ export const saveUser = (values, id) => {
   return axios({
     method: "patch",
     url: `${HOST_API}/v1/users/${id}`,
-    data: values
+    data: values,
   });
 };
 
-export const removeUser = id => {
+export const removeUser = (id) => {
   const token = reactLocalStorage.get("token", false);
   axios.defaults.headers.common["x-access-token"] = token;
   return axios.delete(`${HOST_API}/v1/users/${id}`);
 };
 
-export const getProjects = () => {
+// export const getProjects = () => {
+//   const token = reactLocalStorage.get("token", false);
+//   axios.defaults.headers.common["x-access-token"] = token;
+//   return axios.get(`${HOST_API}/v1/projects`);
+// };
+
+export const getProjects = (params) => {
   const token = reactLocalStorage.get("token", false);
   axios.defaults.headers.common["x-access-token"] = token;
-  return axios.get(`${HOST_API}/v1/projects`);
+  return axios.get(`${HOST_API}/v1/projects`, {
+    params: {
+      results: 10,
+      ...params,
+    },
+  });
 };
 
-export const removeProject = id => {
+export const removeProject = (id) => {
   const token = reactLocalStorage.get("token", false);
   axios.defaults.headers.common["x-access-token"] = token;
   return axios.delete(`${HOST_API}/v1/projects/${id}`);
@@ -75,7 +86,7 @@ export const cloneProject = (id, values) => {
   return axios({
     method: "post",
     url: `${HOST_API}/v1/projects/${id}`,
-    data: values
+    data: values,
   });
 };
 
@@ -85,27 +96,27 @@ export const saveProject = (id, values) => {
   return axios({
     method: "patch",
     url: `${HOST_API}/v1/projects/${id}`,
-    data: values
+    data: values,
   });
 };
 
-export const addProject = formData => {
+export const addProject = (formData) => {
   const token = reactLocalStorage.get("token", false);
   axios.defaults.headers.common["x-access-token"] = token;
   return axios.post(`${HOST_API}/v1/projects`, formData, {
     headers: {
-      "content-type": "multipart/form-data"
-    }
+      "content-type": "multipart/form-data",
+    },
   });
 };
 
-export const addProjectFiles = formData => {
+export const addProjectFiles = (formData) => {
   const token = reactLocalStorage.get("token", false);
   axios.defaults.headers.common["x-access-token"] = token;
   return axios.post(`${HOST_API}/v1/projects/create`, formData, {
     headers: {
-      "content-type": "multipart/form-data"
-    }
+      "content-type": "multipart/form-data",
+    },
   });
 };
 
@@ -115,13 +126,14 @@ export const getEvaluators = () => {
   return axios.get(`${HOST_API}/v1/users/evaluators`);
 };
 
-export const getTasks = id => {
+export const getTasks = (params) => {
   const token = reactLocalStorage.get("token", false);
   axios.defaults.headers.common["x-access-token"] = token;
   return axios.get(`${HOST_API}/v1/tasks`, {
     params: {
-      project: id
-    }
+      results: 10,
+      ...params,
+    },
   });
 };
 
@@ -131,16 +143,16 @@ export const addTask = (tasks, project) => {
   return axios({
     method: "post",
     url: `${HOST_API}/v1/tasks`,
-    data: { tasks, project }
+    data: { tasks, project },
   });
 };
 
-export const removeTask = id => {
+export const removeTask = (id) => {
   const token = reactLocalStorage.get("token", false);
   axios.defaults.headers.common["x-access-token"] = token;
   return axios({
     method: "delete",
-    url: `${HOST_API}/v1/tasks/${id}`
+    url: `${HOST_API}/v1/tasks/${id}`,
   });
 };
 
@@ -150,25 +162,25 @@ export const assignTask = (evaluator, id) => {
   return axios({
     method: "post",
     url: `${HOST_API}/v1/tasks/${id}`,
-    data: { evaluator }
+    data: { evaluator },
   });
 };
 
-export const restartTask = id => {
+export const restartTask = (id) => {
   const token = reactLocalStorage.get("token", false);
   axios.defaults.headers.common["x-access-token"] = token;
   return axios({
     method: "put",
-    url: `${HOST_API}/v1/tasks/${id}`
+    url: `${HOST_API}/v1/tasks/${id}`,
   });
 };
 
-export const activeTask = id => {
+export const activeTask = (id) => {
   const token = reactLocalStorage.get("token", false);
   axios.defaults.headers.common["x-access-token"] = token;
   return axios({
     method: "patch",
-    url: `${HOST_API}/v1/tasks/${id}`
+    url: `${HOST_API}/v1/tasks/${id}`,
   });
 };
 
@@ -178,11 +190,11 @@ export const saveTask = (values, id) => {
   return axios({
     method: "post",
     url: `${HOST_API}/v1/tasks/evaluation/save`,
-    data: { values, task: id }
+    data: { values, task: id },
   });
 };
 
-export const getEvaluatorsTasks = id => {
+export const getEvaluatorsTasks = (id) => {
   const token = reactLocalStorage.get("token", false);
   axios.defaults.headers.common["x-access-token"] = token;
   return axios.get(`${HOST_API}/v1/tasks/${id}`);
@@ -194,12 +206,12 @@ export const getEvaluatorsTasksV1 = () => {
   return axios.get(`${HOST_API}/v1/tasks/evaluator`);
 };
 
-export const finishTask = id => {
+export const finishTask = (id) => {
   const token = reactLocalStorage.get("token", false);
   axios.defaults.headers.common["x-access-token"] = token;
   return axios({
     method: "patch",
     url: `${HOST_API}/v1/tasks/${id}`,
-    data: { finish: true }
+    data: { finish: true },
   });
 };
