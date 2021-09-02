@@ -175,6 +175,15 @@ export const restartTask = (id) => {
   });
 };
 
+export const exportTask = (id) => {
+  const token = reactLocalStorage.get("token", false);
+  axios.defaults.headers.common["x-access-token"] = token;
+  return axios({
+    method: "get",
+    url: `${HOST_API}/v1/tasks/${id}/toExport`,
+  });
+};
+
 export const activeTask = (id) => {
   const token = reactLocalStorage.get("token", false);
   axios.defaults.headers.common["x-access-token"] = token;

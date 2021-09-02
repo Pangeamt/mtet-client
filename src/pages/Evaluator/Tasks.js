@@ -161,7 +161,6 @@ const Tasks = ({ id }) => {
                   <Alert message="This item has been modified" type="success" />
                 </Col>
               )}
-              {console.log(tu)}
             </Row>
           </Col>
           <Col xs={24} md={12}>

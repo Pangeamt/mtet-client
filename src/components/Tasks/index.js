@@ -8,6 +8,7 @@ import {
   PlusOutlined,
   ReloadOutlined,
   UserOutlined,
+  FileTextOutlined
 } from "@ant-design/icons";
 
 import { Icon as LegacyIcon } from "@ant-design/compatible";
@@ -36,6 +37,7 @@ import {
   addTask,
   assignTask,
   restartTask,
+  exportTask,
   activeTask,
 } from "./../../services";
 
@@ -44,8 +46,8 @@ import "./style.css";
 const { Text } = Typography;
 
 const ButtonActions = styled(Button)`
-  margin-right: 10px;
-  margin-left: 10px;
+  margin-right: 5px;
+  margin-left: 5px;
 `;
 
 const Tasks = ({ project }) => {
@@ -55,6 +57,7 @@ const Tasks = ({ project }) => {
   const [visibleForm, setVisibleForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingActive, setLoadingActive] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [evaluators, setEvaluators] = useState([]);
   const [collectionsTasks, setCollectionsTasks] = useState([]);
   const [tus, setTus] = useState([]);
@@ -256,6 +259,44 @@ const Tasks = ({ project }) => {
     }
   };
 
+  const downloadFile = ({ data, fileName, fileType }) => {
+    // Create a blob with the data we want to download as a file
+    const blob = new Blob([data], { type: fileType })
+    // Create an anchor element and dispatch a click event on it
+    // to trigger a download
+    const a = document.createElement('a')
+    a.download = fileName
+    a.href = window.URL.createObjectURL(blob)
+    const clickEvt = new MouseEvent('click', {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    })
+    a.dispatchEvent(clickEvt)
+    a.remove()
+  }
+
+
+
+  const toExport = async (task) => {
+    try {
+      setExporting(`exporting-${task}`);
+      const { data } = await exportTask(task);
+
+      downloadFile({
+        data: JSON.stringify(data),
+        fileName: `task-${task}.json`,
+        fileType: 'text/json',
+      })
+      setExporting(false);
+      handleCancel();
+      message.success("Successful Action!");
+    } catch (error) {
+      handleError(error);
+      setExporting(false);
+    }
+  };
+
   const active = async (task) => {
     try {
       setLoadingActive(`active-${task}`);
@@ -365,10 +406,21 @@ const Tasks = ({ project }) => {
     {
       title: "",
       key: "restart",
-      width: 150,
+      width: 170,
       render: (text, record) => {
         return (
           <React.Fragment>
+            <Tooltip placement="top" title="Export to json file">
+              <ButtonActions
+                loading={exporting === `exporting-${record.id}`}
+                onClick={() => {
+                  toExport(record.id);
+                }}
+                size="small"
+                type="primary"
+                icon={<FileTextOutlined />}
+              ></ButtonActions>
+            </Tooltip>
             <Tooltip placement="top" title="Restart Task">
               <ButtonActions
                 loading={loadingActive === `restart-${record.id}`}

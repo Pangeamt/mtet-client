@@ -12,6 +12,7 @@ import {
   Alert,
   Radio,
   Popconfirm,
+  Input,
 } from "antd";
 
 import EventListener from "react-event-listener";
@@ -63,6 +64,7 @@ const Tuv = ({ item, saveValue, saveJson, saveTranslation, user, task }) => {
   const [tuv, setTuv] = useState(null);
   const [value, setValue] = useState(0);
   const [translation, setTranslation] = useState("");
+  const [comment, setComment] = useState("");
 
   const [accuracy, setAccuracy] = useState(auxValue);
   const [fluency, setFluency] = useState(auxValue);
@@ -71,7 +73,6 @@ const Tuv = ({ item, saveValue, saveJson, saveTranslation, user, task }) => {
   const [localeConvention, setLocaleConvention] = useState(auxValue);
 
   useEffect(() => {
-    console.log("item", item);
     if (item) {
       setTuv(item);
       setValue(item.value);
@@ -81,6 +82,7 @@ const Tuv = ({ item, saveValue, saveJson, saveTranslation, user, task }) => {
       setStyle(JSON.parse(item.style));
       setLocaleConvention(JSON.parse(item.localeConvention));
       setTranslation(item.translation || "");
+      setComment(item.comment || "");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -101,6 +103,11 @@ const Tuv = ({ item, saveValue, saveJson, saveTranslation, user, task }) => {
     saveTranslation(tuv.id, value);
   };
 
+  const onChangeComment = (e) => {
+    setComment(e.target.value);
+    saveJson(tuv.id, 'comment', e.target.value);
+  };
+
   return (
     <Row key={tuv ? tuv.value : ""}>
       {tuv && (
@@ -116,6 +123,7 @@ const Tuv = ({ item, saveValue, saveJson, saveTranslation, user, task }) => {
               {tuv.text}
             </Paragraph>
           </Col>
+          <Input.TextArea placeholder="Comment..." value={comment} onChange={onChangeComment}></Input.TextArea>
           <Col xs={24}>
             {task &&
               (task.project.type === "zero-to-one-hundred" ||
@@ -233,6 +241,7 @@ const Tu = ({ tu, isLoading, save, task, segments }) => {
           style: element.style,
           localeConvention: element.localeConvention,
           translation: element.translation,
+          comment: element.comment,
         });
       });
       setTuvs(array);
